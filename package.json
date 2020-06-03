@@ -1,0 +1,23 @@
+{
+  "name": "book-sale-backend",
+  "version": "1.0.0",
+  "description": "The backend repository for out final project. Backend devs: Miodrag Kruscic and Uros Gluscevic",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/urosgluscevic/book-sale-backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/urosgluscevic/book-sale-backend/issues"
+  },
+  "homepage": "https://github.com/urosgluscevic/book-sale-backend#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.9.17"
+  }
+}
