@@ -4,7 +4,9 @@ const userSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
-        unique: true //will be used as an index
+        unique: true, //will be used as an index
+        minlength: 3,
+        maxlength: 30
     },
     lastName: {
         type: String,
@@ -21,7 +23,8 @@ const userSchema = new mongoose.Schema({
         required: true
     },
     email: { //we could send emails to customers when someone is interrested in their product
-        type: String
+        type: String,
+        maxlength: 50
     },
     bookCoinBalance: { //we're calling them bookCoins unill we get something better
         type: Number,
@@ -34,7 +37,10 @@ const userSchema = new mongoose.Schema({
     comments: { //it's pointless to have comments on a product, because only one person will buy it anyway.
         type: [{type: String}]
     },
-    admin: Boolean //an user is either an admin or a regular user. Guests are not put into the database
+    admin: { //an user is either an admin or a regular user. Guests are not put into the database
+        type: Boolean,
+        required: true
+    }
 }, {timestamps: true});
 
 module.exports = mongoose.model("user", userSchema);
