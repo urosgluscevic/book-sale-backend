@@ -6,7 +6,11 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true, //will be used as an index
         minlength: 3,
-        maxlength: 30
+        maxlength: 40
+    },
+    password: {
+        type: String,
+        required: true
     },
     lastName: {
         type: String,
@@ -34,9 +38,6 @@ const userSchema = new mongoose.Schema({
     profilePictureUrl: String,
     location: String,
     reputation: Number, //users can rate other users, we will use a 5 star system
-    comments: { //it's pointless to have comments on a product, because only one person will buy it anyway.
-        type: [{type: String}]
-    },
     admin: { //an user is either an admin or a regular user. Guests are not put into the database
         type: Boolean,
         required: true
