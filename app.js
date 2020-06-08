@@ -35,15 +35,19 @@ app.post("/register", async(req, res) => { //registering an user (signup)
 app.post("/login", async(req, res) => {
     const userLogin = req.body; //username and password of the user
     const loggedUser = await User.findUserLogin(userLogin.username, userLogin.password); 
-    if(bcrypt.compareSync(userLogin.password,loggedUser.password)){ //if username and password match, proceed 
-        jwt.sign({loggedUser}, "secretkey", {expiresIn: "1h"}, (err, token) => {
-            if(err){
-                return new Error(err);
-            }
-            res.json({token});
-        })
+    if(loggedUser){ //must check if the user exists first
+        if(bcrypt.compareSync(userLogin.password,loggedUser.password)){ //if username and password match, proceed 
+            jwt.sign({loggedUser}, "secretkey", {expiresIn: "1h"}, (err, token) => {
+                if(err){
+                    return new Error(err);
+                }
+                res.json({token});
+            })
+        } else {
+            res.status(403).json({"message": "invalid password"});
+        }
     } else { //if no users are found
-        res.status(403).json({"message": "invalid username or password"});
+        res.status(403).json({"message": "invalid username"});
     }
 })
 
@@ -60,7 +64,6 @@ app.post("/updateProfile", verifyToken, (req, res) => { //lets the user change d
     })
 })
 
-
 app.post("/createPost", verifyToken, async (req,res) => {
     jwt.verify(req.token, "secretkey",async(err, authData)=>{
         if(err){
@@ -73,11 +76,6 @@ app.post("/createPost", verifyToken, async (req,res) => {
         }
     })
 })
-
-
-
-
-
 
 connect(DB_URL)
     .then(()=>{

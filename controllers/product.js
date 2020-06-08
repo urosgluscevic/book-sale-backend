@@ -1,6 +1,5 @@
 const Product = require("../modules/product");
 
-
 function createPost(data){
     return new Promise((resolve, reject) => {
         try{
@@ -10,7 +9,6 @@ function createPost(data){
         }
     })
 }
-
 
 module.exports = {
     createPost
