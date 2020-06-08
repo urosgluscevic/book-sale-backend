@@ -30,8 +30,19 @@ function findUserLogin(username, password){ //authentification
     })
 }
 
+function updateProfile(username, data){
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(User.findOneAndUpdate({"username": username}, data));
+        } catch(err) {
+            return new Error(err);
+        }
+    })
+}
+
 module.exports = {
     findByUsername,
     createUser,
-    findUserLogin
+    findUserLogin,
+    updateProfile
 }

@@ -44,12 +44,15 @@ app.post("/login", async(req, res) => {
     }
 })
 
-app.get("/testLogin", verifyToken, (req, res)=> { //just for testing the login
-    jwt.verify(req.token, "secretkey", (err, authData)=> {
-        if (err){
-            res.sendStatus(403); //if it doesnt work, you get "Forbidden" as the response
+app.post("/updateProfile", verifyToken, (req, res) => { //lets the user change data about himself
+    jwt.verify(req.token, "secretkey", async (err, authData) => {
+        if(err) {
+            res.sendStatus(403);
         } else {
-            res.status(200).json({"message": "auth works"}); //if it works works
+            data = req.body; //new data for the user
+            const username = authData.loggedUser.username; //authdata contains everything about the user who logged in
+            await User.updateProfile(username, data);
+            res.sendStatus(200);
         }
     })
 })
