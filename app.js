@@ -1,6 +1,7 @@
 const express = require("express");
 const {json} = require("body-parser");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 const {connect, verifyToken} = require("./helpers");
 const {DB_URL, PORT} = require("./config");
@@ -13,6 +14,8 @@ app.use(json());
 
 app.post("/register", async(req, res) => { //registering an user (signup)
     const newUser = req.body; // user data passed through the body of the request
+    const hashedPassword = await bcrypt.hash(newUser.password,10);
+    newUser.password =  hashedPassword;
     const alreadyExists = await User.findByUsername(newUser.username); //checks if the username already exists in the base
     if(alreadyExists){
         res.status(403).json({"message": "user already exists"}); //the username is unique, so that is the only thing we need to check
@@ -30,9 +33,8 @@ app.post("/register", async(req, res) => { //registering an user (signup)
 //login route
 app.post("/login", async(req, res) => {
     const userLogin = req.body; //username and password of the user
-    const loggedUser = await User.findUserLogin(userLogin.username, userLogin.password); //password encription will be implemented lated
-
-    if(loggedUser){ //if username and password match, proceed 
+    const loggedUser = await User.findUserLogin(userLogin.username, userLogin.password); 
+    if(bcrypt.compareSync(userLogin.password,loggedUser.password)){ //if username and password match, proceed 
         jwt.sign({loggedUser}, "secretkey", {expiresIn: "1h"}, (err, token) => {
             if(err){
                 return new Error(err);
@@ -52,10 +54,18 @@ app.post("/updateProfile", verifyToken, (req, res) => { //lets the user change d
             data = req.body; //new data for the user
             const username = authData.loggedUser.username; //authdata contains everything about the user who logged in
             await User.updateProfile(username, data);
-            res.sendStatus(200);
+            res.sendStatus(201);
         }
     })
 })
+
+
+//app.post("/createPost")
+
+
+
+
+
 
 connect(DB_URL)
     .then(()=>{

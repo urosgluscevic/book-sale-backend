@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
     //phone and email are contact info, at least one of them has to be required
     //maybe both?
     phoneNumber: {
-        type: Number,
+        type: String,
     },
     email: { //we could send emails to customers when someone is interrested in their product
         type: String,

@@ -23,7 +23,7 @@ function createUser(data){ //created a new user (/register)
 function findUserLogin(username, password){ //authentification
     return new Promise((resolve, reject) => {
         try{
-            resolve(User.findOne({"username": username, "password": password})); //searches for the username with the password
+            resolve(User.findOne({"username": username})); 
         } catch(err) {
             return new Error(err);
         }
