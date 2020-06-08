@@ -20,7 +20,18 @@ function createUser(data){ //created a new user (/register)
     })
 }
 
+function findUserLogin(username, password){ //authentification
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(User.findOne({"username": username, "password": password})); //searches for the username with the password
+        } catch(err) {
+            return new Error(err);
+        }
+    })
+}
+
 module.exports = {
     findByUsername,
-    createUser
+    createUser,
+    findUserLogin
 }

@@ -2,7 +2,7 @@ const express = require("express");
 const {json} = require("body-parser");
 const jwt = require("jsonwebtoken");
 
-const {connect} = require("./helpers");
+const {connect, verifyToken} = require("./helpers");
 const {DB_URL, PORT} = require("./config");
 
 const User = require("./controllers/user");
@@ -25,6 +25,33 @@ app.post("/register", async(req, res) => { //registering an user (signup)
         }
         
     }
+})
+
+//login route
+app.post("/login", async(req, res) => {
+    const userLogin = req.body; //username and password of the user
+    const loggedUser = await User.findUserLogin(userLogin.username, userLogin.password); //password encription will be implemented lated
+
+    if(loggedUser){ //if username and password match, proceed 
+        jwt.sign({loggedUser}, "secretkey", {expiresIn: "1h"}, (err, token) => {
+            if(err){
+                return new Error(err);
+            }
+            res.json({token});
+        })
+    } else { //if no users are found
+        res.status(403).json({"message": "invalid username or password"});
+    }
+})
+
+app.get("/testLogin", verifyToken, (req, res)=> { //just for testing the login
+    jwt.verify(req.token, "secretkey", (err, authData)=> {
+        if (err){
+            res.sendStatus(403); //if it doesnt work, you get "Forbidden" as the response
+        } else {
+            res.status(200).json({"message": "auth works"}); //if it works works
+        }
+    })
 })
 
 connect(DB_URL)
