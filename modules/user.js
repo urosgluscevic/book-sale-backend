@@ -24,15 +24,15 @@ const userSchema = new mongoose.Schema({
     //maybe both?
     phoneNumber: {
         type: Number,
-        required: true
     },
     email: { //we could send emails to customers when someone is interrested in their product
         type: String,
-        maxlength: 50
+        maxlength: 50,
+        // required: true
     },
     bookCoinBalance: { //we're calling them bookCoins unill we get something better
         type: Number,
-        required: true
+        // required: true
     },
     //the profile picture and location should not be required, in order to protect the users privacy
     profilePictureUrl: String,
@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema({
     reputation: Number, //users can rate other users, we will use a 5 star system
     admin: { //an user is either an admin or a regular user. Guests are not put into the database
         type: Boolean,
-        required: true
+        // required: true
     }
 }, {timestamps: true});
 
