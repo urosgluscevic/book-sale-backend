@@ -7,6 +7,7 @@ const {connect, verifyToken} = require("./helpers");
 const {DB_URL, PORT} = require("./config");
 
 const User = require("./controllers/user");
+const Product = require("./controllers/product");
 
 const app = express();
 
@@ -60,7 +61,18 @@ app.post("/updateProfile", verifyToken, (req, res) => { //lets the user change d
 })
 
 
-//app.post("/createPost")
+app.post("/createPost", verifyToken, async (req,res) => {
+    jwt.verify(req.token, "secretkey",async(err, authData)=>{
+        if(err){
+            res.sendStatus(403);
+        } else{
+            data = req.body;
+            data.user = authData.loggedUser._id.toString();
+            await Product.createPost(data);
+            res.sendStatus(201)
+        }
+    })
+})
 
 
 
