@@ -10,6 +10,17 @@ function postComment(data){
     })
 }
 
+function findAllComments(id){
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(Comment.find({"user": id}))
+        } catch(err){
+            reject(new Error(err));
+        }
+    })
+}
+
 module.exports = {
-    postComment
+    postComment,
+    findAllComments
 }

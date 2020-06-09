@@ -96,19 +96,31 @@ app.delete("/deleteUser", verifyToken, (req, res) => { //allows an admin to dele
     })
 })
 
-app.post("/postComment", verifyToken, (req, res) => {
+app.post("/postComment", verifyToken, (req, res) => { //uploading a comment to someones profile
     jwt.verify(req.token, "secretkey", async(err, authData) => {
         if(err){
             res.sendStatus(403);
         } else {
-            const data = req.body;
-            data.postedBy = authData.loggedUser._id.toString();
-            const postedTo = await User.findByUsername(data.username);
-            data.user = postedTo._id.toString();
+            const data = req.body; //content of the comment
+            data.postedBy = authData.loggedUser._id.toString(); //id of the user who posted the comment
+            const postedTo = await User.findByUsername(data.username); //the user who received the comment
+            data.user = postedTo._id.toString(); //id of the receiving user
             const newComment = await Comment.postComment(data);
             res.status(201).json(newComment);
         }
     })
+})
+
+app.get("/comments/:username", async(req, res) => {
+    const username = req.params.username; //person whose profile we want the comments for
+    try{
+        const user = await User.findByUsername(username);
+        const userId = user._id; //the Comment collection only has an id reference to the user, so we need to find the id first
+        const comments = await Comment.findAllComments(userId);
+        res.status(200).json(comments);
+    } catch(err){
+        res.status(403).json(err);
+    }
 })
 
 connect(DB_URL)
