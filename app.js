@@ -8,6 +8,7 @@ const {DB_URL, PORT} = require("./config");
 
 const User = require("./controllers/user");
 const Product = require("./controllers/product");
+const Comment = require("./controllers/comments");
 
 const app = express();
 
@@ -34,7 +35,7 @@ app.post("/register", async(req, res) => { //registering an user (signup)
 //login route
 app.post("/login", async(req, res) => {
     const userLogin = req.body; //username and password of the user
-    const loggedUser = await User.findUserLogin(userLogin.username);
+    const loggedUser = await User.findByUsername(userLogin.username);
     if(loggedUser){ //must check if the user exists first
         if(bcrypt.compareSync(userLogin.password,loggedUser.password)){ //if username and password match, proceed 
             jwt.sign({loggedUser}, "secretkey", {expiresIn: "1h"}, (err, token) => {
@@ -75,7 +76,7 @@ app.post("/createPost", verifyToken, async (req,res) => {
         if(err){
             res.sendStatus(403);
         } else{
-            data = req.body;
+            const data = req.body;
             data.user = authData.loggedUser._id.toString();
             await Product.createPost(data);
             res.sendStatus(201)
@@ -91,6 +92,21 @@ app.delete("/deleteUser", verifyToken, (req, res) => { //allows an admin to dele
             const username = req.body.username; //username of the account to be deleted
             await User.deleteUser(username);
             res.sendStatus(200);
+        }
+    })
+})
+
+app.post("/postComment", verifyToken, (req, res) => {
+    jwt.verify(req.token, "secretkey", async(err, authData) => {
+        if(err){
+            res.sendStatus(403);
+        } else {
+            const data = req.body;
+            data.postedBy = authData.loggedUser._id.toString();
+            const postedTo = await User.findByUsername(data.username);
+            data.user = postedTo._id.toString();
+            const newComment = await Comment.postComment(data);
+            res.status(201).json(newComment);
         }
     })
 })

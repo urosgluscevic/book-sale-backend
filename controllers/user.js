@@ -20,16 +20,6 @@ function createUser(data){ //created a new user (/register)
     })
 }
 
-function findUserLogin(username){ //authentification
-    return new Promise((resolve, reject) => {
-        try{
-            resolve(User.findOne({"username": username})); 
-        } catch(err) {
-            reject(new Error(err));
-        }
-    })
-}
-
 function updateProfile(username, data){ //editing profile data
     return new Promise((resolve, reject) => {
         try{
@@ -53,7 +43,6 @@ function deleteUser(username){ //deleting a profile/account
 module.exports = {
     findByUsername,
     createUser,
-    findUserLogin,
     updateProfile,
     deleteUser
 }
