@@ -70,6 +70,13 @@ app.post("/updateProfile", verifyToken, (req, res) => { //lets the user change d
     })
 })
 
+
+
+
+
+
+
+
 app.post("/createPost", verifyToken, async (req,res) => {
     jwt.verify(req.token, "secretkey",async(err, authData)=>{
         if(err){
