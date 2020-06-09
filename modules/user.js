@@ -32,6 +32,7 @@ const userSchema = new mongoose.Schema({
     },
     bookCoinBalance: { //we're calling them bookCoins unill we get something better
         type: Number,
+        default: 0
         // required: true
     },
     //the profile picture and location should not be required, in order to protect the users privacy
@@ -40,6 +41,7 @@ const userSchema = new mongoose.Schema({
     reputation: Number, //users can rate other users, we will use a 5 star system
     admin: { //an user is either an admin or a regular user. Guests are not put into the database
         type: Boolean,
+        default: false
         // required: true
     }
 }, {timestamps: true});

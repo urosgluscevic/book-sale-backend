@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const transactionSchema = new.mongoose.Schema({
+const transactionSchema = new mongoose.Schema({
     productId:{
         type: mongoose.Schema.Types.ObjectId,
         ref: "product",
@@ -12,7 +12,8 @@ const transactionSchema = new.mongoose.Schema({
     },
     buyer: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "user"
+        ref: "user",
+        required: true
     },
     buyerConsent : {
         type : Boolean,

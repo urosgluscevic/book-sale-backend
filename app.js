@@ -8,6 +8,7 @@ const {DB_URL, PORT} = require("./config");
 
 const User = require("./controllers/user");
 const Product = require("./controllers/product");
+const Transaction = require("./controllers/transaction");
 
 const app = express();
 
@@ -70,7 +71,19 @@ app.post("/updateProfile", verifyToken, (req, res) => { //lets the user change d
     })
 })
 
+app.post("/products/:id/buy", verifyToken, async (req,res) => {
+    jwt.verify(req.token, "secretkey", async (err, authData) => {
+        if(err){
+            res.sendStatus(403);
+        } else{
+            const prodID = req.params.id;
+            await Transaction.createTransaction(prodID,authData.loggedUser._id.toString());
+            res.sendStatus(201);
+        }
 
+
+    })
+})
 
 
 
