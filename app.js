@@ -34,7 +34,7 @@ app.post("/register", async(req, res) => { //registering an user (signup)
 //login route
 app.post("/login", async(req, res) => {
     const userLogin = req.body; //username and password of the user
-    const loggedUser = await User.findUserLogin(userLogin.username, userLogin.password); 
+    const loggedUser = await User.findUserLogin(userLogin.username);
     if(loggedUser){ //must check if the user exists first
         if(bcrypt.compareSync(userLogin.password,loggedUser.password)){ //if username and password match, proceed 
             jwt.sign({loggedUser}, "secretkey", {expiresIn: "1h"}, (err, token) => {
@@ -79,6 +79,18 @@ app.post("/createPost", verifyToken, async (req,res) => {
             data.user = authData.loggedUser._id.toString();
             await Product.createPost(data);
             res.sendStatus(201)
+        }
+    })
+})
+
+app.delete("/deleteUser", verifyToken, (req, res) => { //allows an admin to delete someone's account
+    jwt.verify(req.token, "secretkey", async (err, authData) => {
+        if(err || authData.loggedUser.admin !== true){ //checks if the user is an admin or not
+            res.sendStatus(403);
+        } else {
+            const username = req.body.username; //username of the account to be deleted
+            await User.deleteUser(username);
+            res.sendStatus(200);
         }
     })
 })

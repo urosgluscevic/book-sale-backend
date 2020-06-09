@@ -20,22 +20,32 @@ function createUser(data){ //created a new user (/register)
     })
 }
 
-function findUserLogin(username, password){ //authentification
+function findUserLogin(username){ //authentification
     return new Promise((resolve, reject) => {
         try{
             resolve(User.findOne({"username": username})); 
         } catch(err) {
-            return new Error(err);
+            reject(new Error(err));
         }
     })
 }
 
-function updateProfile(username, data){
+function updateProfile(username, data){ //editing profile data
     return new Promise((resolve, reject) => {
         try{
             resolve(User.findOneAndUpdate({"username": username}, data));
         } catch(err) {
-            return new Error(err);
+            reject(new Error(err));
+        }
+    })
+}
+
+function deleteUser(username){ //deleting a profile/account
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(User.findOneAndDelete({"username": username}))
+        } catch(err){
+            reject(new Error(err));
         }
     })
 }
@@ -44,5 +54,6 @@ module.exports = {
     findByUsername,
     createUser,
     findUserLogin,
-    updateProfile
+    updateProfile,
+    deleteUser
 }
