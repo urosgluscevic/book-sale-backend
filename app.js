@@ -56,7 +56,13 @@ app.post("/updateProfile", verifyToken, (req, res) => { //lets the user change d
         if(err) {
             res.sendStatus(403);
         } else {
-            data = req.body; //new data for the user
+            const data = req.body; //new data for the user
+            //we must prevent the user from editing these using postman or something similar
+            delete data.admin;
+            delete data.username;
+            delete data.password;
+            delete data.bookCoinBalance;
+            delete data.reputation;
             const username = authData.loggedUser.username; //authdata contains everything about the user who logged in
             await User.updateProfile(username, data);
             res.sendStatus(201);
