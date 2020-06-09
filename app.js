@@ -9,6 +9,8 @@ const {DB_URL, PORT} = require("./config");
 const User = require("./controllers/user");
 const Product = require("./controllers/product");
 const Transaction = require("./controllers/transaction");
+const Comment = require("./controllers/comments");
+
 
 const app = express();
 
@@ -35,7 +37,7 @@ app.post("/register", async(req, res) => { //registering an user (signup)
 //login route
 app.post("/login", async(req, res) => {
     const userLogin = req.body; //username and password of the user
-    const loggedUser = await User.findUserLogin(userLogin.username);
+    const loggedUser = await User.findByUsername(userLogin.username);
     if(loggedUser){ //must check if the user exists first
         if(bcrypt.compareSync(userLogin.password,loggedUser.password)){ //if username and password match, proceed 
             jwt.sign({loggedUser}, "secretkey", {expiresIn: "1h"}, (err, token) => {
@@ -95,7 +97,7 @@ app.post("/createPost", verifyToken, async (req,res) => {
         if(err){
             res.sendStatus(403);
         } else{
-            data = req.body;
+            const data = req.body;
             data.user = authData.loggedUser._id.toString();
             await Product.createPost(data);
             res.sendStatus(201)
@@ -113,6 +115,33 @@ app.delete("/deleteUser", verifyToken, (req, res) => { //allows an admin to dele
             res.sendStatus(200);
         }
     })
+})
+
+app.post("/postComment", verifyToken, (req, res) => { //uploading a comment to someones profile
+    jwt.verify(req.token, "secretkey", async(err, authData) => {
+        if(err){
+            res.sendStatus(403);
+        } else {
+            const data = req.body; //content of the comment
+            data.postedBy = authData.loggedUser._id.toString(); //id of the user who posted the comment
+            const postedTo = await User.findByUsername(data.username); //the user who received the comment
+            data.user = postedTo._id.toString(); //id of the receiving user
+            const newComment = await Comment.postComment(data);
+            res.status(201).json(newComment);
+        }
+    })
+})
+
+app.get("/comments/:username", async(req, res) => {
+    const username = req.params.username; //person whose profile we want the comments for
+    try{
+        const user = await User.findByUsername(username);
+        const userId = user._id; //the Comment collection only has an id reference to the user, so we need to find the id first
+        const comments = await Comment.findAllComments(userId);
+        res.status(200).json(comments);
+    } catch(err){
+        res.status(403).json(err);
+    }
 })
 
 connect(DB_URL)
