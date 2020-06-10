@@ -10,6 +10,17 @@ function createPost(data){
     })
 }
 
+function findPostByUserId(userId){
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(Product.find({"user": userId}));
+        } catch(err){
+            reject(new Error(err));
+        }
+    })
+}
+
 module.exports = {
-    createPost
+    createPost,
+    findPostByUserId
 }

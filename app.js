@@ -132,13 +132,22 @@ app.post("/postComment", verifyToken, (req, res) => { //uploading a comment to s
     })
 })
 
-app.get("/comments/:username", async(req, res) => {
-    const username = req.params.username; //person whose profile we want the comments for
+app.get("/findUser/:username", async(req, res) => {
+    const username = req.params.username; //person whose profile we want the data for
     try{
         const user = await User.findByUsername(username);
-        const userId = user._id; //the Comment collection only has an id reference to the user, so we need to find the id first
+        const userId = user._id; // the id is the reference for the comments and products
+        delete user.password;
+
+        // const comments = await Comment.findAllComments(userId);
+        // Promise.all([Comment.findAllComments(userId), Product.findPostByUserId(userId)]).then(values => {
+        //     console.log(values)
+        // })  
+
         const comments = await Comment.findAllComments(userId);
-        res.status(200).json(comments);
+        const products = await Product.findPostByUserId(userId);
+
+        res.status(200).json({"comments": comments, "products": products});
     } catch(err){
         res.status(403).json(err);
     }
