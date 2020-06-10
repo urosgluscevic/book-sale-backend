@@ -137,17 +137,11 @@ app.get("/findUser/:username", async(req, res) => {
     try{
         const user = await User.findByUsername(username);
         const userId = user._id; // the id is the reference for the comments and products
-        delete user.password;
+        user.password = undefined;
 
-        // const comments = await Comment.findAllComments(userId);
-        // Promise.all([Comment.findAllComments(userId), Product.findPostByUserId(userId)]).then(values => {
-        //     console.log(values)
-        // })  
-
-        const comments = await Comment.findAllComments(userId);
-        const products = await Product.findPostByUserId(userId);
-
-        res.status(200).json({"comments": comments, "products": products});
+        Promise.all([Comment.findAllComments(userId), Product.findPostByUserId(userId)]).then(values => {
+            res.status(200).json({values, user});
+        })
     } catch(err){
         res.status(403).json(err);
     }
