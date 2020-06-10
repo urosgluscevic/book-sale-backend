@@ -40,9 +40,20 @@ function deleteComment(id){ //deletes a comment by it's id
     })
 }
 
+function editComment(id, data){ // comment editing
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(Comment.findOneAndUpdate({"_id": id}, data));
+        } catch(err){
+            reject(new Error(err));
+        }
+    })
+}
+
 module.exports = {
     postComment,
     findAllComments,
     findComment,
-    deleteComment
+    deleteComment,
+    editComment
 }

@@ -87,11 +87,6 @@ app.post("/products/:id/buy", verifyToken, async (req,res) => {
     })
 })
 
-
-
-
-
-
 app.post("/createPost", verifyToken, async (req,res) => {
     jwt.verify(req.token, "secretkey",async(err, authData)=>{
         if(err){
@@ -172,9 +167,28 @@ app.delete("/deleteComment", verifyToken, (req, res) => {
     })
 })
 
+app.post("/editComment/:commentId", verifyToken, (req, res) => { //editing a comment
+    jwt.verify(req.token, "secretkey", async(err, authData) => {
+        if(err){
+            res.sendStatus(403);
+        } else {
+            const commentId = req.params.commentId; //id of comment to be edited
+            const data = req.body; // new data used to edit the comment
+
+            const comment = await Comment.findComment(commentId); // comment with the commentId
+            if(authData.loggedUser._id == comment.postedBy){ // was it posted by the user who is making the request?
+                const editedComment = await Comment.editComment(commentId, data); // edits the comment
+                res.status(200).json(editedComment);
+            } else{
+                res.sendStatus(403);
+            }
+        }
+    })
+})
+
 connect(DB_URL)
     .then(()=>{
         app.listen(PORT, ()=>{
-            console.log("Server is active on port " + PORT)
+            console.log("Server is active on port " + PORT);
         })
     })
