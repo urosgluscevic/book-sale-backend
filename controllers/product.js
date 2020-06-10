@@ -20,7 +20,18 @@ function findPostByUserId(userId){
     })
 }
 
+function findPostById(ID){
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(Product.findById(ID));
+        } catch(err){
+            reject(new Error(err));
+        }
+    })
+}
+
 module.exports = {
     createPost,
-    findPostByUserId
+    findPostByUserId,
+    findPostById
 }

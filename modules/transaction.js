@@ -6,6 +6,11 @@ const transactionSchema = new mongoose.Schema({
         ref: "product",
         required: true
     },
+    seller: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+        required: true
+    },
     sellerConsent : {
         type : Boolean,
         default: false

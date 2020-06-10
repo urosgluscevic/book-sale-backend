@@ -77,15 +77,36 @@ app.post("/products/:id/buy", verifyToken, async (req,res) => {
     jwt.verify(req.token, "secretkey", async (err, authData) => {
         if(err){
             res.sendStatus(403);
+            console.log(err);
         } else{
             const prodID = req.params.id;
-            await Transaction.createTransaction(prodID,authData.loggedUser._id.toString());
+            const buyer = await Product.findPostById(prodID);
+            await Transaction.createTransaction(prodID,authData.loggedUser._id.toString(),buyer._id);
             res.sendStatus(201);
         }
 
 
     })
 })
+
+app.get("/myTransactions", verifyToken, async(req,res) =>{
+    jwt.verify(req.token, "secretkey", async (err, authData) => {
+        if(err){
+            res.sendStatus(403);
+        } else{
+            const userId = authData.loggedUser._id.toString();
+            const buy = await Transaction.findBuyerTransactions(userId);
+            const sell = await Transaction.findSellerTransactions(userId);
+            res.json({"buy":[buy],"sell":[sell]})
+            
+        }
+    })
+})
+
+
+
+
+
 
 app.post("/createPost", verifyToken, async (req,res) => {
     jwt.verify(req.token, "secretkey",async(err, authData)=>{
