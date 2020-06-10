@@ -10,7 +10,7 @@ function postComment(data){
     })
 }
 
-function findAllComments(id){
+function findAllComments(id){ //returns all comments of the user with the passed id
     return new Promise((resolve, reject) => {
         try{
             resolve(Comment.find({"user": id}))
@@ -20,7 +20,29 @@ function findAllComments(id){
     })
 }
 
+function findComment(id){ //finds one comment by it's id
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(Comment.findById(id));
+        } catch(err){
+            reject(new Error(err));
+        }
+    })
+}
+
+function deleteComment(id){ //deletes a comment by it's id
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(Comment.findByIdAndDelete(id));
+        } catch (err){
+            reject(new Error(err));
+        }
+    })
+}
+
 module.exports = {
     postComment,
-    findAllComments
+    findAllComments,
+    findComment,
+    deleteComment
 }

@@ -127,7 +127,7 @@ app.post("/postComment", verifyToken, (req, res) => { //uploading a comment to s
             const postedTo = await User.findByUsername(data.username); //the user who received the comment
             data.user = postedTo._id.toString(); //id of the receiving user
             const newComment = await Comment.postComment(data);
-            res.status(201).json(newComment);
+            res.status(201).json(newComment); // in order to find the comment later (for editing and deleting) the frontend should save the comment _id 
         }
     })
 })
@@ -137,14 +137,39 @@ app.get("/findUser/:username", async(req, res) => {
     try{
         const user = await User.findByUsername(username);
         const userId = user._id; // the id is the reference for the comments and products
-        user.password = undefined;
+        user.password = undefined; //can't send password to frontend
 
-        Promise.all([Comment.findAllComments(userId), Product.findPostByUserId(userId)]).then(values => {
+        Promise.all([Comment.findAllComments(userId), Product.findPostByUserId(userId)]).then(values => { //getting the comments and products
             res.status(200).json({values, user});
         })
     } catch(err){
         res.status(403).json(err);
     }
+})
+
+// deleting a comment
+// a regular user can delete only a comment he posted
+// an admin can delete any comment
+app.delete("/deleteComment", verifyToken, (req, res) => {
+    jwt.verify(req.token, "secretkey", async(err, authData) => {
+        if(err){
+            res.sendStatus(403);
+        } else{
+            const commentId = req.body.id; // id of the comment to be deleted
+            if(authData.loggedUser.admin){ // checks if the user making the request is an admin
+                await Comment.deleteComment(commentId); // deletes the comment
+                res.sendStatus(200);
+            } else { // if the user is not an admin
+                const comment = await Comment.findComment(commentId); // first the comment is found
+                if(comment.postedBy == authData.loggedUser._id){ // checks if the user making the request is the one who posted the comment
+                    await Comment.deleteComment(commentId); // deletes the comment
+                    res.sendStatus(200);
+                } else {
+                    res.sendStatus(403);
+                }
+            }
+        }
+    })
 })
 
 connect(DB_URL)
