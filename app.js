@@ -67,8 +67,8 @@ app.post("/updateProfile", verifyToken, (req, res) => { //lets the user change d
             delete data.bookCoinBalance;
             delete data.reputation;
             const username = authData.loggedUser.username; //authdata contains everything about the user who logged in
-            await User.updateProfile(username, data);
-            res.sendStatus(201);
+            const user = await User.updateProfile(username, data);
+            res.status(201).json(user);
         }
     })
 })
@@ -103,11 +103,6 @@ app.get("/myTransactions", verifyToken, async(req,res) =>{
     })
 })
 
-
-
-
-
-
 app.post("/createPost", verifyToken, async (req,res) => {
     jwt.verify(req.token, "secretkey",async(err, authData)=>{
         if(err){
@@ -115,8 +110,8 @@ app.post("/createPost", verifyToken, async (req,res) => {
         } else{
             const data = req.body;
             data.user = authData.loggedUser._id.toString();
-            await Product.createPost(data);
-            res.sendStatus(201)
+            const newProduct = await Product.createPost(data);
+            res.status(201).json(newProduct);
         }
     })
 })
