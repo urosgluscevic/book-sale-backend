@@ -45,13 +45,26 @@ function findProducts(data){
 
             const category = data.category || "";
             const categoryPattern = new RegExp(category, "g");
+            
+            const sortBy = data.sortBy; // parameter to sort by
+            const sortOrder = data.sortOrder; // ascending or descending order
 
-            resolve(Product.find({
+            const matchingProducts = Product.find({
                 "name": {$regex: namePattern},
                 "condition": {$regex: conditionPattern},
                 "price": {$gte: minPrice, $lte: maxPrice}, //greater than minimal price and lesser than the maximum price
                 "category": {$regex: categoryPattern}
-            }));
+            })
+
+            if(sortBy === "price"){
+                matchingProducts.sort({"price": sortOrder})
+            } else if(sortBy === "age"){
+                matchingProducts.sort({"age": sortOrder})
+            } else if(sortBy === "date"){
+                matchingProducts.sort({"createdAt": sortOrder})
+            }
+
+            resolve(matchingProducts);
         } catch(err){
             reject(new Error(err));
         }
