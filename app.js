@@ -122,8 +122,14 @@ app.delete("/deleteUser", verifyToken, (req, res) => { //allows an admin to dele
             res.sendStatus(403);
         } else {
             const username = req.body.username; //username of the account to be deleted
-            await User.deleteUser(username);
-            res.sendStatus(200);
+            const user = await User.findByUsername(username); // we need the user's _id so that we can delete his products and comments
+
+            Promise.all([User.deleteUser(username), Product.deleteProducts(user._id), Comment.deleteComments(user._id)]) // 3 promises - deleting the user, comments and products - Promise.all() is faster
+                .then(()=>{
+                    res.sendStatus(200);
+                }).catch(err => {
+                    res.status(403).json(err);
+                })
         }
     })
 })

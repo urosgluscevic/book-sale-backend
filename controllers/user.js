@@ -40,9 +40,20 @@ function deleteUser(username){ //deleting a profile/account
     })
 }
 
+function findUserById(id){
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(User.findById(id))
+        } catch(err){
+            reject(new Error(err));
+        }
+    })
+}
+
 module.exports = {
     findByUsername,
     createUser,
     updateProfile,
-    deleteUser
+    deleteUser,
+    findUserById
 }

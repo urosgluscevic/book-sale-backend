@@ -54,7 +54,7 @@ function findProducts(data){
                 "condition": {$regex: conditionPattern},
                 "price": {$gte: minPrice, $lte: maxPrice}, //greater than minimal price and lesser than the maximum price
                 "category": {$regex: categoryPattern}
-            })
+            }).populate("user", "username");
 
             if(sortBy === "price"){
                 matchingProducts.sort({"price": sortOrder})
@@ -71,9 +71,20 @@ function findProducts(data){
     })
 }
 
+function deleteProducts(userId){ //called when a user's profile is deleted. deletes all his products
+    return new Promise((resolve, reject) => {
+        try {
+            resolve(Product.deleteMany({"user": userId}));
+        } catch(err){
+            reject(new Error(err));
+        }
+    })
+}
+
 module.exports = {
     createPost,
     findPostByUserId,
     findPostById,
-    findProducts
+    findProducts,
+    deleteProducts
 }

@@ -50,10 +50,21 @@ function editComment(id, data){ // comment editing
     })
 }
 
+function deleteComments(userId){ //called when a user's profile is deleted. deletes all his comments
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(Comment.deleteMany({$or: [{"user": userId}, {"postedBy": userId}]})); //it deletes both the comments he posted, and the ones posted to his profile
+        } catch(err){
+            reject(new Error(err));
+        }
+    })
+}
+
 module.exports = {
     postComment,
     findAllComments,
     findComment,
     deleteComment,
-    editComment
+    editComment,
+    deleteComments
 }
