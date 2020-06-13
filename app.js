@@ -69,8 +69,8 @@ app.post("/updateProfile", verifyToken, (req, res) => { //lets the user change d
             delete data.bookCoinBalance;
             delete data.reputation;
             const username = authData.loggedUser.username; //authdata contains everything about the user who logged in
-            await User.updateProfile(username, data);
-            res.sendStatus(201);
+            const updatedUser = await User.updateProfile(username, data);
+            res.status(201).json(updatedUser);
         }
     })
 })
@@ -179,8 +179,8 @@ app.post("/createPost", verifyToken, async (req,res) => {
         } else{
             const data = req.body;
             data.user = authData.loggedUser._id.toString();
-            await Product.createPost(data);
-            res.sendStatus(201)
+            const product = await Product.createPost(data);
+            res.sendStatus(201).json(product)
         }
     })
 })
@@ -203,6 +203,8 @@ app.delete("/deleteUser/:username", verifyToken, (req, res) => { //allows an adm
             } else {
                 res.status(403).json({"message": "User does not exist"});
             } 
+        } else {
+            res.sendStatus(403);
         }
     })
 })
@@ -282,6 +284,16 @@ app.post("/editComment/:commentId", verifyToken, (req, res) => { //editing a com
             }
         }
     })
+})
+
+app.post("/findProduct", async(req, res) => {
+    try{
+        const data = req.body;
+        const matchingProducts = await Product.findProducts(data);
+        res.status(200).json(matchingProducts);
+    } catch(err){
+        res.status(403).json(err);
+    }
 })
 
 connect(DB_URL)
