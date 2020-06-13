@@ -30,6 +30,16 @@ function updateProfile(username, data){ //editing profile data
     })
 }
 
+function updateProfilebById(ID, data){ //editing profile data
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(User.findByIdAndUpdate(ID, data));
+        } catch(err) {
+            reject(new Error(err));
+        }
+    })
+}
+
 function deleteUser(username){ //deleting a profile/account
     return new Promise((resolve, reject) => {
         try{
@@ -55,5 +65,7 @@ module.exports = {
     createUser,
     updateProfile,
     deleteUser,
-    findUserById
+    findUserById,
+    updateProfilebById
+
 }

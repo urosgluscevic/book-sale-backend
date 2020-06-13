@@ -1,4 +1,5 @@
 const Transaction = require("../modules/transaction.js");
+const transaction = require("../modules/transaction.js");
 
 function createTransaction(product,buyer,seller){
     const data = {
@@ -15,6 +16,69 @@ function createTransaction(product,buyer,seller){
     })
 }
 
+function findTransactionById(transactionId){
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(Transaction.findById(transactionId).exec());
+        } catch (err){
+            reject(new Error(err));
+        }
+    })
+}
+
+function findTransaction(data){
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(Transaction.find(data).exec());
+        } catch (err){
+            reject(new Error(err));
+        }
+    })
+}
+
+
+
+
+function removeTransaction(productId){
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(Transaction.remove({productId:productId}).exec());
+        } catch (err){
+            reject(new Error(err));
+        }
+    })
+}
+
+
+
+
+
+
+function findTransactionByIdAccept(transactionId){
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(Transaction.findById(transactionId).populate("seller").populate("buyer").populate("productId").exec());
+        } catch (err){
+            reject(new Error(err));
+        }
+    })
+}
+
+
+
+
+
+function findTransactionByIdAndUpdate(transactionId,operation){
+    return new Promise((resolve, reject) => {
+        try{
+            data = {};
+            data[operation]=true;
+            resolve(Transaction.findByIdAndUpdate(transactionId, data));
+        } catch (err){
+            reject(new Error(err));
+        }
+    })
+}
 
 function findBuyerTransactions(userId){
     return new Promise((resolve, reject) => {
@@ -40,5 +104,10 @@ function findSellerTransactions(userId){
 module.exports = {
     createTransaction,
     findBuyerTransactions,
-    findSellerTransactions
+    findSellerTransactions,
+    findTransactionById,
+    findTransactionByIdAndUpdate,
+    findTransactionByIdAccept,
+    removeTransaction,
+    findTransaction
 }
