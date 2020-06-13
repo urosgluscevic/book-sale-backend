@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 function connect(url){
-    return mongoose.connect(url);
+    return mongoose.connect(url, { useFindAndModify: false });
 }
 
 function verifyToken(req, res, next){ //auth function for getting the token
