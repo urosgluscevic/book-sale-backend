@@ -84,8 +84,6 @@ app.post("/products/:id/buy", verifyToken, async (req,res) => {
             await Transaction.createTransaction(prodID,authData.loggedUser._id.toString(),buyer._id);
             res.sendStatus(201);
         }
-
-
     })
 })
 
@@ -98,7 +96,6 @@ app.get("/myTransactions", verifyToken, async(req,res) =>{
             const buy = await Transaction.findBuyerTransactions(userId);
             const sell = await Transaction.findSellerTransactions(userId);
             res.json({"buy":[buy],"sell":[sell]})
-            
         }
     })
 })
@@ -116,20 +113,24 @@ app.post("/createPost", verifyToken, async (req,res) => {
     })
 })
 
-app.delete("/deleteUser", verifyToken, (req, res) => { //allows an admin to delete someone's account
+app.delete("/deleteUser/:username", verifyToken, (req, res) => { //allows an admin to delete someone's account
     jwt.verify(req.token, "secretkey", async (err, authData) => {
-        if(err || authData.loggedUser.admin !== true){ //checks if the user is an admin or not
+        if(err){ //checks if the user is an admin or not
             res.sendStatus(403);
-        } else {
-            const username = req.body.username; //username of the account to be deleted
+        } else if(authData.loggedUser.admin == true || req.params.username == authData.loggedUser.username){
+            const username = req.params.username; //username of the account to be deleted
             const user = await User.findByUsername(username); // we need the user's _id so that we can delete his products and comments
 
-            Promise.all([User.deleteUser(username), Product.deleteProducts(user._id), Comment.deleteComments(user._id)]) // 3 promises - deleting the user, comments and products - Promise.all() is faster
+            if(user){
+                Promise.all([User.deleteUser(username), Product.deleteProducts(user._id), Comment.deleteComments(user._id)]) // 3 promises - deleting the user, comments and products - Promise.all() is faster
                 .then(()=>{
                     res.sendStatus(200);
                 }).catch(err => {
                     res.status(403).json(err);
                 })
+            } else {
+                res.status(403).json({"message": "User does not exist"});
+            } 
         }
     })
 })
@@ -151,17 +152,20 @@ app.post("/postComment", verifyToken, (req, res) => { //uploading a comment to s
 
 app.get("/findUser/:username", async(req, res) => {
     const username = req.params.username; //person whose profile we want the data for
-    try{
-        const user = await User.findByUsername(username);
+    
+    const user = await User.findByUsername(username);
+
+    if(user){
         const userId = user._id; // the id is the reference for the comments and products
         user.password = undefined; //can't send password to frontend
 
-        Promise.all([Comment.findAllComments(userId), Product.findPostByUserId(userId)]).then(values => { //getting the comments and products
-            res.status(200).json({values, user});
-        })
-    } catch(err){
-        res.status(403).json(err);
-    }
+        const products = await Product.findPostByUserId(userId);
+        const comments = await Comment.findAllComments(userId);
+
+        res.status(200).json({comments, products, user})
+    } else {
+        res.status(403).json({"message": "User does not exist"});
+    }    
 })
 
 // deleting a comment
