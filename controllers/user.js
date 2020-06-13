@@ -23,7 +23,7 @@ function createUser(data){ //created a new user (/register)
 function updateProfile(username, data){ //editing profile data
     return new Promise((resolve, reject) => {
         try{
-            resolve(User.findOneAndUpdate({"username": username}, data));
+            resolve(User.findOneAndUpdate({"username": username}, data, {new: true}));
         } catch(err) {
             reject(new Error(err));
         }
