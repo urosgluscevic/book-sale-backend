@@ -2,6 +2,9 @@ const express = require("express");
 const {json} = require("body-parser");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const fs = require("fs");
+const fileupload = require("express-fileupload");
+const {google} = require("googleapis");
 
 const {connect, verifyToken} = require("./helpers");
 const {DB_URL, PORT} = require("./config");
@@ -10,13 +13,11 @@ const User = require("./controllers/user");
 const Product = require("./controllers/product");
 const Transaction = require("./controllers/transaction");
 const Comment = require("./controllers/comments");
-const e = require("express");
-const user = require("./modules/user");
-
 
 const app = express();
 
 app.use(json());
+app.use(fileupload());
 
 app.post("/register", async(req, res) => { //registering an user (signup)
     const newUser = req.body; // user data passed through the body of the request
@@ -286,7 +287,7 @@ app.post("/editComment/:commentId", verifyToken, (req, res) => { //editing a com
     })
 })
 
-app.post("/findProduct", async(req, res) => {
+app.post("/findProduct", async(req, res) => { //searches for all the products which match the passed parameters
     try{
         const data = req.body;
         const matchingProducts = await Product.findProducts(data);
@@ -294,6 +295,91 @@ app.post("/findProduct", async(req, res) => {
     } catch(err){
         res.status(403).json(err);
     }
+})
+
+app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be stored on google drive 
+    jwt.verify(req.token, "secretkey", async(err, authData)=>{
+        if (err){
+            res.sendStatus(403);
+        } else{
+            const file = req.files.upfile;
+            const name = file.name;
+            const uploadPath = __dirname + "/" + name;
+
+            let newUrl;
+
+            const uploadTo = req.params.uploadTo; //is it a user profile picture, or a product picture
+        
+            file.mv(uploadPath, (err)=>{
+                if(err){
+                    console.log("file upload failed", name, err);
+                    res.send("Error occured")
+                } else {
+                    console.log("uploaded", name)
+                }
+            })
+            
+            const TOKEN_PATH = 'token.json';
+        
+            // Load client secrets from a local file.
+            fs.readFile('credentials.json', (err, content) => {
+            if (err) return console.log('Error loading client secret file:', err);
+            // Authorize a client with credentials, then call the Google Drive API.
+            authorize(JSON.parse(content), uploadFile);
+            });
+        
+            /**
+             * Create an OAuth2 client with the given credentials, and then execute the
+             * given callback function.
+             * @param {Object} credentials The authorization client credentials.
+             * @param {function} callback The callback to call with the authorized client.
+             */
+            function authorize(credentials, callback) {
+            const {client_secret, client_id, redirect_uris} = credentials.installed;
+            const oAuth2Client = new google.auth.OAuth2(
+                client_id, client_secret, redirect_uris[0]);
+        
+            // Check if we have previously stored a token.
+            fs.readFile(TOKEN_PATH, (err, token) => {
+                if (err) return getAccessToken(oAuth2Client, callback);
+                oAuth2Client.setCredentials(JSON.parse(token));
+                callback(oAuth2Client);
+            });
+            }
+        
+            function uploadFile(auth) {
+                const drive = google.drive({ version: 'v3', auth });
+                var fileMetadata = {
+                    'name': name
+                };
+                var media = {
+                    mimeType: 'image/jpeg',
+                    body: fs.createReadStream(name)
+                };
+                drive.files.create({
+                    resource: fileMetadata,
+                    media: media,
+                    fields: '*'
+                }, function (err, response) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        newUrl = response.data.thumbnailLink;
+                        User.updateProfile(authData.loggedUser.username, {"profilePictureUrl": newUrl}).then(()=>{ //updates the profilePicture field
+                            fs.unlink(uploadPath, (err)=>{ //image is deleted from our server
+                                if(err){
+                                    console.log("file deletion failed", name, err);
+                                } else {
+                                    console.log("deleted", name)
+                                }
+                            })
+                            res.status(201).json(newUrl)
+                        })
+                    }
+                });
+            }
+        }
+    })
 })
 
 connect(DB_URL)
