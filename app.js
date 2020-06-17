@@ -43,7 +43,7 @@ app.post("/login", async(req, res) => {
     const loggedUser = await User.findByUsername(userLogin.username);
     if(loggedUser){ //must check if the user exists first
         if(bcrypt.compareSync(userLogin.password,loggedUser.password)){ //if username and password match, proceed 
-            jwt.sign({loggedUser}, "secretkey", {expiresIn: "1h"}, (err, token) => {
+            jwt.sign({loggedUser}, "booksaleMiodragUros1134", {expiresIn: "1h"}, (err, token) => {
                 if(err){
                     return new Error(err);
                 }
@@ -58,7 +58,7 @@ app.post("/login", async(req, res) => {
 })
 
 app.post("/updateProfile", verifyToken, (req, res) => { //lets the user change data about himself
-    jwt.verify(req.token, "secretkey", async (err, authData) => {
+    jwt.verify(req.token, "booksaleMiodragUros1134", async (err, authData) => {
         if(err) {
             res.sendStatus(403);
         } else {
@@ -77,7 +77,7 @@ app.post("/updateProfile", verifyToken, (req, res) => { //lets the user change d
 })
 
 app.get("/products/:id/buy", verifyToken, async (req,res) => {
-    jwt.verify(req.token, "secretkey", async (err, authData) => {
+    jwt.verify(req.token, "booksaleMiodragUros1134", async (err, authData) => {
         if(err){
             res.sendStatus(403);
             console.log(err);
@@ -99,7 +99,7 @@ app.get("/products/:id/buy", verifyToken, async (req,res) => {
 })
 
 app.get("/transactions", verifyToken, async(req,res) =>{
-    jwt.verify(req.token, "secretkey", async (err, authData) => {
+    jwt.verify(req.token, "booksaleMiodragUros1134", async (err, authData) => {
         if(err){
             res.sendStatus(403);
         } else{
@@ -112,7 +112,7 @@ app.get("/transactions", verifyToken, async(req,res) =>{
 })
 
 app.get("/transactions/:id", verifyToken, async(req,res) => {
-    jwt.verify(req.token, "secretkey", async (err, authData) => {
+    jwt.verify(req.token, "booksaleMiodragUros1134", async (err, authData) => {
         if(err){
             res.sendStatus(403);
         } else{
@@ -129,7 +129,7 @@ app.get("/transactions/:id", verifyToken, async(req,res) => {
 })
 
 app.get("/transactions/:id/accept", verifyToken, async(req,res) => {
-    jwt.verify(req.token, "secretkey", async (err, authData) => {
+    jwt.verify(req.token, "booksaleMiodragUros1134", async (err, authData) => {
         if(err){
             res.sendStatus(403);
         } else{
@@ -174,7 +174,7 @@ app.get("/transactions/:id/accept", verifyToken, async(req,res) => {
 
 
 app.post("/createPost", verifyToken, async (req,res) => {
-    jwt.verify(req.token, "secretkey",async(err, authData)=>{
+    jwt.verify(req.token, "booksaleMiodragUros1134",async(err, authData)=>{
         if(err){
             res.sendStatus(403);
         } else{
@@ -187,7 +187,7 @@ app.post("/createPost", verifyToken, async (req,res) => {
 })
 
 app.delete("/deleteUser/:username", verifyToken, (req, res) => { //allows an admin to delete someone's account
-    jwt.verify(req.token, "secretkey", async (err, authData) => {
+    jwt.verify(req.token, "booksaleMiodragUros1134", async (err, authData) => {
         if(err){ //checks if the user is an admin or not
             res.sendStatus(403);
         } else if(authData.loggedUser.admin == true || req.params.username == authData.loggedUser.username){
@@ -211,7 +211,7 @@ app.delete("/deleteUser/:username", verifyToken, (req, res) => { //allows an adm
 })
 
 app.post("/postComment", verifyToken, (req, res) => { //uploading a comment to someones profile
-    jwt.verify(req.token, "secretkey", async(err, authData) => {
+    jwt.verify(req.token, "booksaleMiodragUros1134", async(err, authData) => {
         if(err){
             res.sendStatus(403);
         } else {
@@ -247,7 +247,7 @@ app.get("/findUser/:username", async(req, res) => {
 // a regular user can delete only a comment he posted
 // an admin can delete any comment
 app.delete("/deleteComment", verifyToken, (req, res) => {
-    jwt.verify(req.token, "secretkey", async(err, authData) => {
+    jwt.verify(req.token, "booksaleMiodragUros1134", async(err, authData) => {
         if(err){
             res.sendStatus(403);
         } else{
@@ -269,7 +269,7 @@ app.delete("/deleteComment", verifyToken, (req, res) => {
 })
 
 app.post("/editComment/:commentId", verifyToken, (req, res) => { //editing a comment
-    jwt.verify(req.token, "secretkey", async(err, authData) => {
+    jwt.verify(req.token, "booksaleMiodragUros1134", async(err, authData) => {
         if(err){
             res.sendStatus(403);
         } else {
@@ -298,7 +298,7 @@ app.post("/findProduct", async(req, res) => { //searches for all the products wh
 })
 
 app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be stored on google drive 
-    jwt.verify(req.token, "secretkey", async(err, authData)=>{
+    jwt.verify(req.token, "booksaleMiodragUros1134", async(err, authData)=>{
         if (err){
             res.sendStatus(403);
         } else{
