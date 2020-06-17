@@ -365,16 +365,40 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
                         console.log(err);
                     } else {
                         newUrl = response.data.thumbnailLink;
-                        User.updateProfile(authData.loggedUser.username, {"profilePictureUrl": newUrl}).then(()=>{ //updates the profilePicture field
-                            fs.unlink(uploadPath, (err)=>{ //image is deleted from our server
-                                if(err){
-                                    console.log("file deletion failed", name, err);
-                                } else {
-                                    console.log("deleted", name)
+
+                        if(uploadTo === "user"){
+                            User.updateProfile(authData.loggedUser.username, {"profilePictureUrl": newUrl}).then(()=>{ //updates the profilePicture field
+                                fs.unlink(uploadPath, (err)=>{ //image is deleted from our server
+                                    if(err){
+                                        console.log("file deletion failed", name, err);
+                                    } else {
+                                        console.log("deleted", name)
+                                    }
+                                })
+                                res.status(201).json(newUrl)
+                            })
+                        } else if(uploadTo === "product"){
+                            const productId = req.query.productId;
+
+                            Product.findPostById(productId).then((foundProduct) => {
+                                if(foundProduct.user == authData.loggedUser._id){
+                                    Product.updateProduct(productId, {"imageUrl": newUrl}).then(()=>{
+                                        fs.unlink(uploadPath, (err)=>{ //image is deleted from our server
+                                            if(err){
+                                                console.log("file deletion failed", name, err);
+                                            } else {
+                                                console.log("deleted", name)
+                                            }
+                                        })
+                                        res.status(201).json(newUrl)
+                                    })
+                                } else{
+                                    res.status(403).json({"message": "invalid product"});
                                 }
                             })
-                            res.status(201).json(newUrl)
-                        })
+                        } else {
+                            res.status(403).json({"message": "No uploadTo parameter passed"})
+                        }
                     }
                 });
             }
