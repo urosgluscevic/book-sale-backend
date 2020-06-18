@@ -28,12 +28,11 @@ app.post("/register", async(req, res) => { //registering an user (signup)
         res.status(403).json({"message": "user already exists"}); //the username is unique, so that is the only thing we need to check
     } else {
         try{
-            await User.createUser(newUser); //user is created
-            res.sendStatus(201); //201 = created
+            const createdUser = await User.createUser(newUser); //user is created
+            res.status(201).json({"Added user": createdUser, "Message": "User created successfully"}); //201 = created
         } catch(err){
-            res.status(403).json(err)
-        }
-        
+            res.status(403).json({"Error": err, "Message": "User creation failed"});
+        } 
     }
 })
 
@@ -43,11 +42,11 @@ app.post("/login", async(req, res) => {
     const loggedUser = await User.findByUsername(userLogin.username);
     if(loggedUser){ //must check if the user exists first
         if(bcrypt.compareSync(userLogin.password,loggedUser.password)){ //if username and password match, proceed 
-            jwt.sign({loggedUser}, "booksaleMiodragUros1134", {expiresIn: "1h"}, (err, token) => {
+            jwt.sign({loggedUser}, "booksaleMiodragUros1134", {expiresIn: "2h"}, (err, token) => {
                 if(err){
                     return new Error(err);
                 }
-                res.json({token});
+                res.status(200).json({token, "Message": "User logged in successfully"});
             })
         } else {
             res.status(403).json({"message": "invalid password"});
@@ -71,7 +70,7 @@ app.post("/updateProfile", verifyToken, (req, res) => { //lets the user change d
             delete data.reputation;
             const username = authData.loggedUser.username; //authdata contains everything about the user who logged in
             const updatedUser = await User.updateProfile(username, data);
-            res.status(201).json(updatedUser);
+            res.status(201).json({updatedUser, "Message": "Profile updated"});
         }
     })
 })
@@ -181,7 +180,7 @@ app.post("/createPost", verifyToken, async (req,res) => {
             const data = req.body;
             data.user = authData.loggedUser._id.toString();
             const product = await Product.createPost(data);
-            res.sendStatus(201).json(product)
+            res.status(201).json({product, "Message": "Product added"})
         }
     })
 })
@@ -197,12 +196,12 @@ app.delete("/deleteUser/:username", verifyToken, (req, res) => { //allows an adm
             if(user){
                 Promise.all([User.deleteUser(username), Product.deleteProducts(user._id), Comment.deleteComments(user._id)]) // 3 promises - deleting the user, comments and products - Promise.all() is faster
                 .then(()=>{
-                    res.sendStatus(200);
+                    res.status(200).json({"Message": "Profile deleted"});
                 }).catch(err => {
                     res.status(403).json(err);
                 })
             } else {
-                res.status(403).json({"message": "User does not exist"});
+                res.status(403).json({"Message": "User does not exist"});
             } 
         } else {
             res.sendStatus(403);
@@ -220,7 +219,7 @@ app.post("/postComment", verifyToken, (req, res) => { //uploading a comment to s
             const postedTo = await User.findByUsername(data.username); //the user who received the comment
             data.user = postedTo._id.toString(); //id of the receiving user
             const newComment = await Comment.postComment(data);
-            res.status(201).json(newComment); // in order to find the comment later (for editing and deleting) the frontend should save the comment _id 
+            res.status(201).json({newComment, "Message": "Comment added"}); // in order to find the comment later (for editing and deleting) the frontend should save the comment _id 
         }
     })
 })
@@ -254,12 +253,12 @@ app.delete("/deleteComment", verifyToken, (req, res) => {
             const commentId = req.body.id; // id of the comment to be deleted
             if(authData.loggedUser.admin){ // checks if the user making the request is an admin
                 await Comment.deleteComment(commentId); // deletes the comment
-                res.sendStatus(200);
+                res.status(200).json({"Message": "Comment deleted"});
             } else { // if the user is not an admin
                 const comment = await Comment.findComment(commentId); // first the comment is found
                 if(comment.postedBy == authData.loggedUser._id){ // checks if the user making the request is the one who posted the comment
                     await Comment.deleteComment(commentId); // deletes the comment
-                    res.sendStatus(200);
+                    res.status(200).json({"Message": "Comment deleted"});
                 } else {
                     res.sendStatus(403);
                 }
@@ -279,7 +278,7 @@ app.post("/editComment/:commentId", verifyToken, (req, res) => { //editing a com
             const comment = await Comment.findComment(commentId); // comment with the commentId
             if(authData.loggedUser._id == comment.postedBy){ // was it posted by the user who is making the request?
                 const editedComment = await Comment.editComment(commentId, data); // edits the comment
-                res.status(200).json(editedComment);
+                res.status(200).json({editedComment, "Message": "Comment edited"});
             } else{
                 res.sendStatus(403);
             }
@@ -291,7 +290,12 @@ app.post("/findProduct", async(req, res) => { //searches for all the products wh
     try{
         const data = req.body;
         const matchingProducts = await Product.findProducts(data);
-        res.status(200).json(matchingProducts);
+
+        if(matchingProducts){
+            res.status(200).json({matchingProducts, "Message": "Products found"});
+        } else {
+            res.status(200).json({"Message": "No products found"})
+        }
     } catch(err){
         res.status(403).json(err);
     }
@@ -339,12 +343,12 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
             const oAuth2Client = new google.auth.OAuth2(
                 client_id, client_secret, redirect_uris[0]);
         
-            // Check if we have previously stored a token.
-            fs.readFile(TOKEN_PATH, (err, token) => {
-                if (err) return getAccessToken(oAuth2Client, callback);
-                oAuth2Client.setCredentials(JSON.parse(token));
-                callback(oAuth2Client);
-            });
+                // Check if we have previously stored a token.
+                fs.readFile(TOKEN_PATH, (err, token) => {
+                    if (err) return getAccessToken(oAuth2Client, callback);
+                    oAuth2Client.setCredentials(JSON.parse(token));
+                    callback(oAuth2Client);
+                });
             }
         
             function uploadFile(auth) {
