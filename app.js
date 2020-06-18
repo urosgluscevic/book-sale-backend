@@ -172,9 +172,6 @@ app.get("/transactions/:id/accept", verifyToken, async(req,res) => {
     })
 })
 
-
-
-
 app.post("/createPost", verifyToken, async (req,res) => {
     jwt.verify(req.token, "booksaleMiodragUros1134",async(err, authData)=>{
         if(err){

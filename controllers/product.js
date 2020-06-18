@@ -81,7 +81,6 @@ function deleteProducts(userId){ //called when a user's profile is deleted. dele
     })
 }
 
-
 function deleteProduct(productId){ 
     return new Promise((resolve, reject) => {
         try {
@@ -91,9 +90,6 @@ function deleteProduct(productId){
         }
     })
 }
-
-
-
 
 function updateProduct(id, data){
     return new Promise((resolve, reject)=>{
