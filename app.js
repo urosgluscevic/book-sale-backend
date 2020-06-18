@@ -166,11 +166,14 @@ app.get("/transactions/:id/accept", verifyToken, async(req,res) => {
                     sellerCoin = transaction.seller.bookCoinBalance + transaction.productId.price;
                     await User.updateProfilebById(transaction.seller._id,{"bookCoinBalance": sellerCoin});
                     await Transaction.removeTransaction(transaction.productId);
+                    await Product.deleteProduct(transaction.productId);
                 }
             }
         }
     })
 })
+
+
 
 
 app.post("/createPost", verifyToken, async (req,res) => {

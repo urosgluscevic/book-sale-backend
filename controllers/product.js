@@ -81,6 +81,20 @@ function deleteProducts(userId){ //called when a user's profile is deleted. dele
     })
 }
 
+
+function deleteProduct(productId){ 
+    return new Promise((resolve, reject) => {
+        try {
+            resolve(Product.deleteOne({"_id": productId}));
+        } catch(err){
+            reject(new Error(err));
+        }
+    })
+}
+
+
+
+
 function updateProduct(id, data){
     return new Promise((resolve, reject)=>{
         try{
@@ -97,5 +111,6 @@ module.exports = {
     findPostById,
     findProducts,
     deleteProducts,
-    updateProduct
+    updateProduct,
+    deleteProduct
 }
