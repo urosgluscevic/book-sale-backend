@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const fs = require("fs");
 const fileupload = require("express-fileupload");
 const {google} = require("googleapis");
-
+const url = require("url");
 const {connect, verifyToken} = require("./helpers");
 const {DB_URL, PORT} = require("./config");
 
@@ -13,6 +13,7 @@ const User = require("./controllers/user");
 const Product = require("./controllers/product");
 const Transaction = require("./controllers/transaction");
 const Comment = require("./controllers/comments");
+const e = require("express");
 
 const app = express();
 
@@ -97,6 +98,19 @@ app.get("/products/:id/buy", verifyToken, async (req,res) => {
     })
 })
 
+app.get("/stats/registrations/:gte/:lt",verifyToken, async(req,res) => {
+    jwt.verify(req.token, "booksaleMiodragUros1134", async (err, authData) =>{
+        if(err || authData.loggedUser.admin == false){
+            res.sendStatus(403);
+        } else {
+            const data = await User.numberOfRegistrations(req.params.gte.toString(),req.params.lt.toString());
+            res.status(200).json({"Number of registrations":data});
+        }
+    })
+})
+
+
+
 app.get("/transactions", verifyToken, async(req,res) =>{
     jwt.verify(req.token, "booksaleMiodragUros1134", async (err, authData) => {
         if(err){
@@ -165,7 +179,7 @@ app.get("/transactions/:id/accept", verifyToken, async(req,res) => {
                     sellerCoin = transaction.seller.bookCoinBalance + transaction.productId.price;
                     await User.updateProfilebById(transaction.seller._id,{"bookCoinBalance": sellerCoin});
                     await Transaction.removeTransaction(transaction.productId);
-                    await Product.deleteProduct(transaction.productId);
+                    await Product.deleteProduct(transaction.productId._id);
                 }
             }
         }

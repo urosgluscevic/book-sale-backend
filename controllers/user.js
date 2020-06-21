@@ -50,6 +50,23 @@ function deleteUser(username){ //deleting a profile/account
     })
 }
 
+
+function numberOfRegistrations(gte,lt){
+    return new Promise((resolve, reject) =>{
+        try {
+            resolve(User.find({createdAt: {
+                $gte: ISODate(gte + " 00:00:00.000Z"),
+                $lt: ISODate(lt + " 23:59:99.999Z")}
+                }).count())
+        } catch(err){
+            reject(new Error(err));
+        }
+    })
+}
+
+
+
+
 function findUserById(id){
     return new Promise((resolve, reject) => {
         try{
@@ -66,6 +83,7 @@ module.exports = {
     updateProfile,
     deleteUser,
     findUserById,
-    updateProfilebById
+    updateProfilebById,
+    numberOfRegistrations
 
 }
