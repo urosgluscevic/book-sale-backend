@@ -5,7 +5,6 @@ const bcrypt = require("bcrypt");
 const fs = require("fs");
 const fileupload = require("express-fileupload");
 const {google} = require("googleapis");
-const url = require("url");
 const {connect, verifyToken} = require("./helpers");
 const {DB_URL, PORT} = require("./config");
 
@@ -13,17 +12,21 @@ const User = require("./controllers/user");
 const Product = require("./controllers/product");
 const Transaction = require("./controllers/transaction");
 const Comment = require("./controllers/comments");
-const e = require("express");
 
 const app = express();
 
 app.use(json());
 app.use(fileupload());
 
+app.get("/", (req, res) => {
+    res.status(200).json({"Message":"Welcome to book api"});
+})
+
 app.post("/register", async(req, res) => { //registering an user (signup)
     const newUser = req.body; // user data passed through the body of the request
     const hashedPassword = await bcrypt.hash(newUser.password,10);
     newUser.password =  hashedPassword;
+    newUser.admin = false; //becoming an admin will be added later
     const alreadyExists = await User.findByUsername(newUser.username); //checks if the username already exists in the base
     if(alreadyExists){
         res.status(403).json({"message": "user already exists"}); //the username is unique, so that is the only thing we need to check
@@ -237,12 +240,6 @@ app.post("/postComment", verifyToken, (req, res) => { //uploading a comment to s
         }
     })
 })
-
-app.get("/", async(req,res)=>{
-    res.status(200).json({"Message":"Welcome to book api"});
-})
-
-
 
 app.get("/findUser/:username", async(req, res) => {
     const username = req.params.username; //person whose profile we want the data for
