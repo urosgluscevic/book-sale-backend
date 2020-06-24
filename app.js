@@ -238,6 +238,12 @@ app.post("/postComment", verifyToken, (req, res) => { //uploading a comment to s
     })
 })
 
+app.get("/", async(req,res)=>{
+    res.status(200).json({"Message":"Welcome to book api"});
+})
+
+
+
 app.get("/findUser/:username", async(req, res) => {
     const username = req.params.username; //person whose profile we want the data for
     
