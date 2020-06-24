@@ -50,7 +50,6 @@ function deleteUser(username){ //deleting a profile/account
     })
 }
 
-
 function numberOfRegistrations(gte,lt){
     return new Promise((resolve, reject) =>{
         try {
@@ -64,9 +63,6 @@ function numberOfRegistrations(gte,lt){
     })
 }
 
-
-
-
 function findUserById(id){
     return new Promise((resolve, reject) => {
         try{
@@ -77,6 +73,23 @@ function findUserById(id){
     })
 }
 
+function addRating(username, rating){ //adding reputation to a user
+    return new Promise((resolve, reject) => {
+        try {
+            User.findOne({"username": username}).then(user => {
+                let {ratings, reputation} = user;
+
+                ratings += 1; //the number of people who rated this user
+                reputation = (reputation * (ratings - 1) + rating) / ratings; //average rating
+
+                resolve(User.findOneAndUpdate({"username": username}, {"ratings": ratings, "reputation": reputation}, {new: true}));
+            })
+        } catch (err) {
+            reject(new Error(err))
+        }
+    }) 
+}
+
 module.exports = {
     findByUsername,
     createUser,
@@ -84,6 +97,6 @@ module.exports = {
     deleteUser,
     findUserById,
     updateProfilebById,
-    numberOfRegistrations
-
+    numberOfRegistrations,
+    addRating
 }

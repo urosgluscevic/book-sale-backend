@@ -315,6 +315,29 @@ app.post("/findProduct", async(req, res) => { //searches for all the products wh
     }
 })
 
+app.get("/addRating/:username/:rating", verifyToken, (req, res) => {
+    jwt.verify(req.token, "booksaleMiodragUros1134", async(err, authData) => {
+        if(err){
+            res.sendStatus(403);
+        } else {
+            const username = req.params.username;
+            const rating = parseInt(req.params.rating);
+
+            if(username && rating){
+                const user = await User.findByUsername(username);
+                if(user){
+                    const updatedUser = await User.addRating(username, rating)
+                    res.status(200).json(updatedUser);
+                } else {
+                    res.status(403).json({"Message": "Invalid username"})
+                }
+            } else {
+                res.status(403).json({"Message": "No username or rating provided"})
+            }
+        }
+    })
+})
+
 app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be stored on google drive 
     jwt.verify(req.token, "booksaleMiodragUros1134", async(err, authData)=>{
         if (err){

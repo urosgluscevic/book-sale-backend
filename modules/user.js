@@ -38,7 +38,14 @@ const userSchema = new mongoose.Schema({
     //the profile picture and location should not be required, in order to protect the users privacy
     profilePictureUrl: String,
     location: String,
-    reputation: Number, //users can rate other users, we will use a 5 star system
+    reputation: {
+        type: Number,
+        default: 0
+    }, //users can rate other users, we will use a 5 star system
+    ratings: {
+        type: Number,
+        default: 0
+    },
     admin: { //an user is either an admin or a regular user. Guests are not put into the database
         type: Boolean,
         default: false
