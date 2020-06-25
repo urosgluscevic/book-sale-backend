@@ -3,6 +3,7 @@ const {json} = require("body-parser");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const fs = require("fs");
+const cors = require("cors");
 const fileupload = require("express-fileupload");
 const {google} = require("googleapis");
 const {connect, verifyToken} = require("./helpers");
@@ -16,17 +17,12 @@ const Comment = require("./controllers/comments");
 const app = express();
 
 
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-  });
-
+app.use(cors());
 app.use(json());
 app.use(fileupload());
 
 app.get("/", (req, res) => {
-    res.status(200).json({"Message":"Welcome to boosk api"});
+    res.status(200).json({"Message":"Welcome to book api"});
 })
 
 
