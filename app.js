@@ -23,7 +23,7 @@ app.use(json());
 app.use(fileupload());
 
 app.get("/", (req, res) => {
-    res.status(200).json({"Message":"Welcome to book api"});
+    res.status(200).json({"Message":"Welcome to bok api"});
 })
 
 
