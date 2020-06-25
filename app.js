@@ -30,8 +30,6 @@ app.get("/", (req, res) => {
 
 app.post("/register", async(req, res) => { //registering an user (signup)
     const newUser = req.body; // user data passed through the body of the request
-    console.log({newUser}),
-    console.log({req})
     const hashedPassword = await bcrypt.hash(newUser.password,10);
     newUser.password =  hashedPassword;
     newUser.admin = false; //becoming an admin will be added later
