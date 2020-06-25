@@ -22,6 +22,13 @@ app.get("/", (req, res) => {
     res.status(200).json({"Message":"Welcome to book api"});
 })
 
+
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
+
 app.post("/register", async(req, res) => { //registering an user (signup)
     const newUser = req.body; // user data passed through the body of the request
     const hashedPassword = await bcrypt.hash(newUser.password,10);
