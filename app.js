@@ -279,7 +279,7 @@ app.delete("/deleteComment", verifyToken, (req, res) => {
                 res.status(200).json({"Message": "Comment deleted"});
             } else { // if the user is not an admin
                 const comment = await Comment.findComment(commentId); // first the comment is found
-                if(comment.postedBy == authData.loggedUser._id){ // checks if the user making the request is the one who posted the comment
+                if(comment.postedBy._id == authData.loggedUser._id){ // checks if the user making the request is the one who posted the comment
                     await Comment.deleteComment(commentId); // deletes the comment
                     res.status(200).json({"Message": "Comment deleted"});
                 } else {
