@@ -13,7 +13,7 @@ function postComment(data){
 function findAllComments(id){ //returns all comments of the user with the passed id
     return new Promise((resolve, reject) => {
         try{
-            resolve(Comment.find({"user": id}))
+            resolve(Comment.find({"user": id}).populate("postedBy", "username"))
         } catch(err){
             reject(new Error(err));
         }
@@ -23,7 +23,7 @@ function findAllComments(id){ //returns all comments of the user with the passed
 function findComment(id){ //finds one comment by it's id
     return new Promise((resolve, reject) => {
         try{
-            resolve(Comment.findById(id));
+            resolve(Comment.findById(id).populate("postedBy", "username"));
         } catch(err){
             reject(new Error(err));
         }

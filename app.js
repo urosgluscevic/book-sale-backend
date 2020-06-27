@@ -273,7 +273,7 @@ app.delete("/deleteComment", verifyToken, (req, res) => {
         if(err){
             res.sendStatus(403);
         } else{
-            const commentId = req.body.id; // id of the comment to be deleted
+            const commentId = req.body.commentId; // id of the comment to be deleted
             if(authData.loggedUser.admin){ // checks if the user making the request is an admin
                 await Comment.deleteComment(commentId); // deletes the comment
                 res.status(200).json({"Message": "Comment deleted"});
