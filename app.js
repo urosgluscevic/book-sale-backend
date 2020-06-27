@@ -299,8 +299,7 @@ app.post("/editComment/:commentId", verifyToken, (req, res) => { //editing a com
             const data = req.body; // new data used to edit the comment
 
             const comment = await Comment.findComment(commentId); // comment with the commentId
-            console.log(authData.loggedUser._id, comment.postedBy)
-            if(authData.loggedUser._id == comment.postedBy){ // was it posted by the user who is making the request?
+            if(authData.loggedUser._id == comment.postedBy._id){ // was it posted by the user who is making the request?
                 const editedComment = await Comment.editComment(commentId, data); // edits the comment
                 res.status(200).json({editedComment, "Message": "Comment edited"});
             } else{
