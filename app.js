@@ -41,7 +41,7 @@ app.post("/register", async(req, res) => { //registering an user (signup)
             const createdUser = await User.createUser(newUser); //user is created
             res.status(201).json({"Added user": createdUser, "Message": "User created successfully"}); //201 = created
         } catch(err){
-            res.status(403).json({"Error": err, "Message": "User creation failed"});
+            res.status(500).json({"Error": err, "Message": "User creation failed"});
         } 
     }
 })
@@ -69,7 +69,7 @@ app.post("/login", async(req, res) => {
 app.post("/updateProfile", verifyToken, (req, res) => { //lets the user change data about himself
     jwt.verify(req.token, "booksaleMiodragUros1134", async (err, authData) => {
         if(err) {
-            res.sendStatus(403);
+            res.sendStatus(401); //unauthorized
         } else {
             const data = req.body; //new data for the user
             //we must prevent the user from editing these using postman or something similar
@@ -88,7 +88,7 @@ app.post("/updateProfile", verifyToken, (req, res) => { //lets the user change d
 app.get("/products/:id/buy", verifyToken, async (req,res) => {
     jwt.verify(req.token, "booksaleMiodragUros1134", async (err, authData) => {
         if(err){
-            res.sendStatus(403);
+            res.sendStatus(401);
             console.log(err);
         } else{
             const prodID = req.params.id;
@@ -110,7 +110,7 @@ app.get("/products/:id/buy", verifyToken, async (req,res) => {
 app.get("/stats/registrations/:gte/:lt",verifyToken, async(req,res) => {
     jwt.verify(req.token, "booksaleMiodragUros1134", async (err, authData) =>{
         if(err || authData.loggedUser.admin == false){
-            res.sendStatus(403);
+            res.sendStatus(401);
         } else {
             const data = await User.numberOfRegistrations(req.params.gte.toString(),req.params.lt.toString());
             res.status(200).json({"Number of registrations":data});
@@ -118,12 +118,10 @@ app.get("/stats/registrations/:gte/:lt",verifyToken, async(req,res) => {
     })
 })
 
-
-
 app.get("/transactions", verifyToken, async(req,res) =>{
     jwt.verify(req.token, "booksaleMiodragUros1134", async (err, authData) => {
         if(err){
-            res.sendStatus(403);
+            res.sendStatus(401);
         } else{
             const userId = authData.loggedUser._id.toString();
             const buy = await Transaction.findBuyerTransactions(userId);
@@ -136,15 +134,15 @@ app.get("/transactions", verifyToken, async(req,res) =>{
 app.get("/transactions/:id", verifyToken, async(req,res) => {
     jwt.verify(req.token, "booksaleMiodragUros1134", async (err, authData) => {
         if(err){
-            res.sendStatus(403);
+            res.sendStatus(401);
         } else{
             const userId = authData.loggedUser._id.toString();
             const transaction = await Transaction.findTransactionById(req.params.id);
             if(transaction.buyer == userId || transaction.seller == userId){
-                res.status(200).json(transaction);
+                res.status(200).json({transaction});
             }
             else{
-                res.sendStatus(403);
+                res.status(403).json({"Message": "You are not the buyer or the seller"});
             }
         }
     })
@@ -153,7 +151,7 @@ app.get("/transactions/:id", verifyToken, async(req,res) => {
 app.get("/transactions/:id/accept", verifyToken, async(req,res) => {
     jwt.verify(req.token, "booksaleMiodragUros1134", async (err, authData) => {
         if(err){
-            res.sendStatus(403);
+            res.sendStatus(401);
         } else{
             const userId = authData.loggedUser._id.toString();
             const transaction = await Transaction.findTransactionByIdAccept(req.params.id);
@@ -166,7 +164,7 @@ app.get("/transactions/:id/accept", verifyToken, async(req,res) => {
                         res.sendStatus(201);
                     }
                     else{
-                        res.status(201).json({"message":"Not enough book coins"});
+                        res.status(403).json({"message":"Not enough book coins"});
                     }
 
                     break;
@@ -198,7 +196,7 @@ app.get("/transactions/:id/accept", verifyToken, async(req,res) => {
 app.post("/createPost", verifyToken, async (req,res) => {
     jwt.verify(req.token, "booksaleMiodragUros1134",async(err, authData)=>{
         if(err){
-            res.sendStatus(403);
+            res.sendStatus(401);
         } else{
             const data = req.body;
             data.user = authData.loggedUser._id.toString();
@@ -211,7 +209,7 @@ app.post("/createPost", verifyToken, async (req,res) => {
 app.delete("/deleteUser/:username", verifyToken, (req, res) => { //allows an admin to delete someone's account
     jwt.verify(req.token, "booksaleMiodragUros1134", async (err, authData) => {
         if(err){ //checks if the user is an admin or not
-            res.sendStatus(403);
+            res.sendStatus(401);
         } else if(authData.loggedUser.admin == true || req.params.username == authData.loggedUser.username){
             const username = req.params.username; //username of the account to be deleted
             const user = await User.findByUsername(username); // we need the user's _id so that we can delete his products and comments
@@ -221,13 +219,13 @@ app.delete("/deleteUser/:username", verifyToken, (req, res) => { //allows an adm
                 .then(()=>{
                     res.status(200).json({"Message": "Profile deleted"});
                 }).catch(err => {
-                    res.status(403).json(err);
+                    res.status(500).json(err);
                 })
             } else {
                 res.status(403).json({"Message": "User does not exist"});
             } 
         } else {
-            res.sendStatus(403);
+            res.status(403).json({"Message": "You are not authorized to delete this account"});
         }
     })
 })
@@ -235,7 +233,7 @@ app.delete("/deleteUser/:username", verifyToken, (req, res) => { //allows an adm
 app.post("/postComment", verifyToken, (req, res) => { //uploading a comment to someones profile
     jwt.verify(req.token, "booksaleMiodragUros1134", async(err, authData) => {
         if(err){
-            res.sendStatus(403);
+            res.sendStatus(401);
         } else {
             const data = req.body; //content of the comment
             data.postedBy = authData.loggedUser._id.toString(); //id of the user who posted the comment
@@ -276,7 +274,7 @@ app.get("/findUser/:username", async(req, res) => {
 app.delete("/deleteComment", verifyToken, (req, res) => {
     jwt.verify(req.token, "booksaleMiodragUros1134", async(err, authData) => {
         if(err){
-            res.sendStatus(403);
+            res.sendStatus(401);
         } else{
             const commentId = req.body.commentId; // id of the comment to be deleted
             if(authData.loggedUser.admin){ // checks if the user making the request is an admin
@@ -289,7 +287,7 @@ app.delete("/deleteComment", verifyToken, (req, res) => {
                         await Comment.deleteComment(commentId); // deletes the comment
                         res.status(200).json({"Message": "Comment deleted"});
                     } else {
-                        res.sendStatus(403);
+                        res.status(403).json({"Message": "You are not authorized to delete this comment"});
                     }
                 } else {
                     res.status(404).json({"Message":"Comment does not exist"})
@@ -302,7 +300,7 @@ app.delete("/deleteComment", verifyToken, (req, res) => {
 app.post("/editComment/:commentId", verifyToken, (req, res) => { //editing a comment
     jwt.verify(req.token, "booksaleMiodragUros1134", async(err, authData) => {
         if(err){
-            res.sendStatus(403);
+            res.sendStatus(401);
         } else {
             const commentId = req.params.commentId; //id of comment to be edited
             const data = req.body; // new data used to edit the comment
@@ -313,7 +311,7 @@ app.post("/editComment/:commentId", verifyToken, (req, res) => { //editing a com
                     const editedComment = await Comment.editComment(commentId, data); // edits the comment
                     res.status(200).json({editedComment, "Message": "Comment edited"});
                 } else{
-                    res.sendStatus(403);
+                    res.status(403).json({"Message": "You are not authorized to edit this comment"});
                 }
             } else{
                 res.status(404).json({"Message":"Comment does not exist"})
@@ -340,7 +338,7 @@ app.post("/findProduct", async(req, res) => { //searches for all the products wh
 app.get("/addRating/:username/:rating", verifyToken, (req, res) => {
     jwt.verify(req.token, "booksaleMiodragUros1134", async(err, authData) => {
         if(err){
-            res.sendStatus(403);
+            res.sendStatus(401);
         } else {
             const username = req.params.username;
             const rating = parseInt(req.params.rating);
@@ -354,7 +352,7 @@ app.get("/addRating/:username/:rating", verifyToken, (req, res) => {
                     res.status(403).json({"Message": "Invalid username"})
                 }
             } else {
-                res.status(403).json({"Message": "No username or rating provided"})
+                res.status(400).json({"Message": "No username or rating provided"})
             }
         }
     })
@@ -363,7 +361,7 @@ app.get("/addRating/:username/:rating", verifyToken, (req, res) => {
 app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be stored on google drive 
     jwt.verify(req.token, "booksaleMiodragUros1134", async(err, authData)=>{
         if (err){
-            res.sendStatus(403);
+            res.sendStatus(401);
         } else{
             const file = req.files.upfile;
             const name = file.name;
@@ -456,11 +454,11 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
                                         res.status(201).json(newUrl)
                                     })
                                 } else{
-                                    res.status(403).json({"message": "invalid product"});
+                                    res.status(403).json({"Message": "You are not the owner of this product"});
                                 }
                             })
                         } else {
-                            res.status(403).json({"message": "No uploadTo parameter passed"})
+                            res.status(400).json({"message": "No uploadTo parameter passed"})
                         }
                     }
                 });
