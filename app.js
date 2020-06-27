@@ -240,9 +240,14 @@ app.post("/postComment", verifyToken, (req, res) => { //uploading a comment to s
             const data = req.body; //content of the comment
             data.postedBy = authData.loggedUser._id.toString(); //id of the user who posted the comment
             const postedTo = await User.findByUsername(data.username); //the user who received the comment
-            data.user = postedTo._id.toString(); //id of the receiving user
-            const newComment = await Comment.postComment(data);
-            res.status(201).json({newComment, "Message": "Comment added"}); // in order to find the comment later (for editing and deleting) the frontend should save the comment _id 
+
+            if(postedTo){
+                data.user = postedTo._id.toString(); //id of the receiving user
+                const newComment = await Comment.postComment(data);
+                res.status(201).json({newComment, "Message": "Comment added"}); // in order to find the comment later (for editing and deleting) the frontend should save the comment _id 
+            } else {
+                res.status(404).json({"Message": "User whose account you are trying to comment on does not exist"})
+            }
         }
     })
 })
@@ -279,11 +284,15 @@ app.delete("/deleteComment", verifyToken, (req, res) => {
                 res.status(200).json({"Message": "Comment deleted"});
             } else { // if the user is not an admin
                 const comment = await Comment.findComment(commentId); // first the comment is found
-                if(comment.postedBy._id == authData.loggedUser._id){ // checks if the user making the request is the one who posted the comment
-                    await Comment.deleteComment(commentId); // deletes the comment
-                    res.status(200).json({"Message": "Comment deleted"});
+                if(comment){
+                    if(comment.postedBy._id == authData.loggedUser._id){ // checks if the user making the request is the one who posted the comment
+                        await Comment.deleteComment(commentId); // deletes the comment
+                        res.status(200).json({"Message": "Comment deleted"});
+                    } else {
+                        res.sendStatus(403);
+                    }
                 } else {
-                    res.sendStatus(403);
+                    res.status(404).json({"Message":"Comment does not exist"})
                 }
             }
         }
@@ -299,11 +308,15 @@ app.post("/editComment/:commentId", verifyToken, (req, res) => { //editing a com
             const data = req.body; // new data used to edit the comment
 
             const comment = await Comment.findComment(commentId); // comment with the commentId
-            if(authData.loggedUser._id == comment.postedBy._id){ // was it posted by the user who is making the request?
-                const editedComment = await Comment.editComment(commentId, data); // edits the comment
-                res.status(200).json({editedComment, "Message": "Comment edited"});
+            if(comment){
+                if(authData.loggedUser._id == comment.postedBy._id){ // was it posted by the user who is making the request?
+                    const editedComment = await Comment.editComment(commentId, data); // edits the comment
+                    res.status(200).json({editedComment, "Message": "Comment edited"});
+                } else{
+                    res.sendStatus(403);
+                }
             } else{
-                res.sendStatus(403);
+                res.status(404).json({"Message":"Comment does not exist"})
             }
         }
     })
