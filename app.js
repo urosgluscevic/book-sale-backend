@@ -95,14 +95,16 @@ app.get("/products/:id/buy", verifyToken, async (req,res) => {
             const balance = await User.findByUsername(authData.loggedUser.username)
             const seller = await Product.findPostById(prodID);
             const check = await Transaction.findTransaction({"productId":prodID,"buyer":authData.loggedUser._id});
-                if(balance.bookCoinBalance >= seller.price && check[0] == undefined){
-                    await Transaction.createTransaction(prodID,authData.loggedUser._id.toString(),seller.user);
-                    res.sendStatus(201);
+            if(balance.bookCoinBalance >= seller.price && check[0] == undefined){
+                await Transaction.createTransaction(prodID,authData.loggedUser._id.toString(),seller.user);
+                res.status(201).json({"Message": "Transaction created"});
+            } else{
+                if(check[0]){
+                    res.status(403).json({"Message": "You already have a transaction related to this product"})
+                } else {
+                    res.status(403).json({"Message": "You do not have enough bookCoins to buy this product"})
                 }
-                else{
-                    res.status(200).json({"message":"Error something is wrong"})
-                    console.log(check[0] == undefined)
-                }
+            }
         }
     })
 })

@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
     },
     bookCoinBalance: { //we're calling them bookCoins unill we get something better
         type: Number,
-        default: 0
+        default: 30
         // required: true
     },
     //the profile picture and location should not be required, in order to protect the users privacy
