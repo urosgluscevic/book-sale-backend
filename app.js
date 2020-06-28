@@ -386,8 +386,8 @@ app.get("/deleteProduct/:id", verifyToken, (req, res) => {
 
 app.get("/getProducts/:quantity", async (req, res) => {
     const quantity = req.params.quantity; //number of products to get
-    parseInt(quantity); //turns quantity into number
-    const products = await Product.getProducts(quantity); //finds certain number of products
+    const numberQuantity = parseInt(quantity); //turns quantity into number
+    const products = await Product.getProducts(numberQuantity); //finds certain number of products
     res.status(200).json({products});
 })
 
