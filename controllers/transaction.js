@@ -1,5 +1,4 @@
 const Transaction = require("../modules/transaction.js");
-const transaction = require("../modules/transaction.js");
 
 function createTransaction(product,buyer,seller){
     const data = {
@@ -36,9 +35,6 @@ function findTransaction(data){
     })
 }
 
-
-
-
 function removeTransaction(productId){
     return new Promise((resolve, reject) => {
         try{
@@ -49,11 +45,6 @@ function removeTransaction(productId){
     })
 }
 
-
-
-
-
-
 function findTransactionByIdAccept(transactionId){
     return new Promise((resolve, reject) => {
         try{
@@ -63,10 +54,6 @@ function findTransactionByIdAccept(transactionId){
         }
     })
 }
-
-
-
-
 
 function findTransactionByIdAndUpdate(transactionId,operation){
     return new Promise((resolve, reject) => {
@@ -100,6 +87,15 @@ function findSellerTransactions(userId){
     })
 }
 
+function dropAllTransactions(productId){ //deletes all transactions related to a product that has been deleted
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(Transaction.deleteMany({"productId": productId}));
+        } catch(err) {
+            reject(new Error(err));
+        }
+    })
+}
 
 module.exports = {
     createTransaction,
@@ -109,5 +105,6 @@ module.exports = {
     findTransactionByIdAndUpdate,
     findTransactionByIdAccept,
     removeTransaction,
-    findTransaction
+    findTransaction,
+    dropAllTransactions
 }

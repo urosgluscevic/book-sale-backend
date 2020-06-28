@@ -224,7 +224,7 @@ app.delete("/deleteUser/:username", verifyToken, (req, res) => { //allows an adm
                     res.status(500).json(err);
                 })
             } else {
-                res.status(403).json({"Message": "User does not exist"});
+                res.status(400).json({"Message": "User does not exist"});
             } 
         } else {
             res.status(403).json({"Message": "You are not authorized to delete this account"});
@@ -246,7 +246,7 @@ app.post("/postComment", verifyToken, (req, res) => { //uploading a comment to s
                 const newComment = await Comment.postComment(data);
                 res.status(201).json({newComment, "Message": "Comment added"}); // in order to find the comment later (for editing and deleting) the frontend should save the comment _id 
             } else {
-                res.status(404).json({"Message": "User whose account you are trying to comment on does not exist"})
+                res.status(400).json({"Message": "User whose account you are trying to comment on does not exist"})
             }
         }
     })
@@ -266,7 +266,7 @@ app.get("/findUser/:username", async(req, res) => {
 
         res.status(200).json({comments, products, user})
     } else {
-        res.status(403).json({"message": "User does not exist"});
+        res.status(400).json({"message": "User does not exist"});
     }    
 })
 
@@ -292,7 +292,7 @@ app.delete("/deleteComment", verifyToken, (req, res) => {
                         res.status(403).json({"Message": "You are not authorized to delete this comment"});
                     }
                 } else {
-                    res.status(404).json({"Message":"Comment does not exist"})
+                    res.status(400).json({"Message":"Comment does not exist"})
                 }
             }
         }
@@ -316,7 +316,7 @@ app.post("/editComment/:commentId", verifyToken, (req, res) => { //editing a com
                     res.status(403).json({"Message": "You are not authorized to edit this comment"});
                 }
             } else{
-                res.status(404).json({"Message":"Comment does not exist"})
+                res.status(400).json({"Message":"Comment does not exist"})
             }
         }
     })
@@ -355,6 +355,30 @@ app.get("/addRating/:username/:rating", verifyToken, (req, res) => {
                 }
             } else {
                 res.status(400).json({"Message": "No username or rating provided"})
+            }
+        }
+    })
+})
+
+app.get("/deleteProduct/:id", verifyToken, (req, res) => {
+    jwt.verify(req.token, "booksaleMiodragUros1134", async (err, authData) => {
+        if(err){
+            res.sendStatus(403);
+        } else {
+            const productId = req.params.id;
+            const product = await Product.findPostById(productId) //finds product to be deleted
+            if(product){
+                if(authData.loggedUser.admin == true || authData.loggedUser._id == product.user){
+                    Promise.all([Product.deleteProduct(productId), Transaction.dropAllTransactions(productId)]).then(() => {
+                        res.status(200).json({"Message": "Product and related transactions deleted successfully"});
+                    }).catch(err => {
+                        res.status(500).json({"Message": "Product deletion failed", "Error": err});
+                    })
+                } else {
+                    res.status(403).json({"Message": "You are not authorized to delete this product"})
+                }
+            } else {
+                res.status(400).json({"Message": "Product does not exist"});
             }
         }
     })
