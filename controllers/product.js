@@ -101,6 +101,16 @@ function updateProduct(id, data){
     })
 }
 
+function getProducts(quantity){ //returns certain number of products
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(Product.find({}).limit(quantity).sort({"createdAt": -1}));
+        } catch(err) {
+            reject(new Error(err));
+        }
+    })
+}
+
 module.exports = {
     createPost,
     findPostByUserId,
@@ -108,5 +118,6 @@ module.exports = {
     findProducts,
     deleteProducts,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    getProducts
 }

@@ -384,6 +384,13 @@ app.get("/deleteProduct/:id", verifyToken, (req, res) => {
     })
 })
 
+app.get("/getProducts/:quantity", async (req, res) => {
+    const quantity = req.params.quantity; //number of products to get
+    parseInt(quantity); //turns quantity into number
+    const products = await Products.getProducts(quantity); //finds certain number of products
+    res.status(200).json({products});
+})
+
 app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be stored on google drive 
     jwt.verify(req.token, "booksaleMiodragUros1134", async(err, authData)=>{
         if (err){
