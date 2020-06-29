@@ -398,10 +398,7 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
         if (err){
             res.sendStatus(401);
         } else{
-            // const file = req.files.upfile;
-            const file = req.body.upfile;
-            console.log(req.body)
-            console.log({file});
+            const file = req.files.upfile;
             const name = file.name;
             const uploadPath = __dirname + "/" + name;
 
