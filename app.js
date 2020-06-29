@@ -199,6 +199,7 @@ app.post("/createPost", verifyToken, async (req,res) => {
     jwt.verify(req.token, "booksaleMiodragUros1134",async(err, authData)=>{
         if(err){
             res.status(401).json({err});
+            console.log({err})
         } else{
             const data = req.body;
             data.user = authData.loggedUser._id.toString();
