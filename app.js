@@ -217,14 +217,8 @@ app.delete("/deleteUser/:username", verifyToken, (req, res) => { //allows an adm
             const user = await User.findByUsername(username); // we need the user's _id so that we can delete his products and comments
 
             if(user){
-                const products = await Product.findPostByUserId(user._id);
-                const productIds = [];
-                products.forEach(product => {
-                    productIds.push(product._id);
-                    console.log(product._id);
-                })
-                console.log(productIds);
-                Promise.all([User.deleteUser(username), Product.deleteProducts(user._id), Comment.deleteComments(user._id)]) // 3 promises - deleting the user, comments and products - Promise.all() is faster
+                const userId = user._id;
+                Promise.all([User.deleteUser(username), Product.deleteProducts(userId), Comment.deleteComments(userId), Transaction.dropByUserId(userId)]) // 4 promises - deleting the user, comments, products and transactions - Promise.all() is faster
                 .then(()=>{
                     res.status(200).json({"Message": "Profile deleted"});
                 }).catch(err => {

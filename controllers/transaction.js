@@ -97,6 +97,16 @@ function dropAllTransactions(productId){ //deletes all transactions related to a
     })
 }
 
+function dropByUserId(userId){
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(Transaction.deleteMany({$or: [{"seller": userId}, {"buyer": userId}]})); //deletes transactions involving the user
+        } catch(err){
+            reject(new Error(err));
+        }
+    })
+}
+
 module.exports = {
     createTransaction,
     findBuyerTransactions,
@@ -106,5 +116,6 @@ module.exports = {
     findTransactionByIdAccept,
     removeTransaction,
     findTransaction,
-    dropAllTransactions
+    dropAllTransactions,
+    dropByUserId
 }
