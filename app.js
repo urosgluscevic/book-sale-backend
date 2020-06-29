@@ -198,7 +198,7 @@ app.get("/transactions/:id/accept", verifyToken, async(req,res) => {
 app.post("/createPost", verifyToken, async (req,res) => {
     jwt.verify(req.token, "booksaleMiodragUros1134",async(err, authData)=>{
         if(err){
-            res.sendStatus(401);
+            res.status(401).json({err});
         } else{
             const data = req.body;
             data.user = authData.loggedUser._id.toString();
