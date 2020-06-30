@@ -475,7 +475,7 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
                                 resource: body,
                                 auth: auth
                             }, function (err, res, body) {
-                                deferred.resolve(body);
+                                // deferred.resolve(body);
                             });
                         })
 
