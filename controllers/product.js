@@ -104,7 +104,7 @@ function updateProduct(id, data){
 function getProducts(quantity){ //returns certain number of products
     return new Promise((resolve, reject) => {
         try{
-            resolve(Product.find({}).limit(quantity).sort({"createdAt": -1}));
+            resolve(Product.find({}).limit(quantity).populate("user", ["username", "profilePictureUrl"]).sort({"createdAt": -1}));
         } catch(err) {
             reject(new Error(err));
         }
