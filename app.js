@@ -461,6 +461,7 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
                         console.log(err);
                     } else {
                         newUrl = response.data.thumbnailLink;
+                        console.log(response.data)
 
                         if(uploadTo === "user"){
                             User.updateProfile(authData.loggedUser.username, {"profilePictureUrl": newUrl}).then(()=>{ //updates the profilePicture field
