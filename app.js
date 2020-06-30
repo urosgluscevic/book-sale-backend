@@ -468,6 +468,24 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
                         newUrl = response.data.thumbnailLink;
                         // console.log(response.data)
 
+                        const permission = {
+                            "type": "anyone",
+                            "role": "reader"
+                        };
+
+                        drive.permissions.create({
+                            resource: permission,
+                            fileId: response.data.id,
+                            fields: "*"
+                        }, (error, result) => {
+                            if(error){
+                                console.log(error)
+                                res.status(400).json({error})
+                            } else {
+                                console.log(result)
+                            }
+                        })
+
                         if(uploadTo === "user"){
                             User.updateProfile(authData.loggedUser.username, {"profilePictureUrl": newUrl}).then(()=>{ //updates the profilePicture field
                                 fs.unlink(uploadPath, (err)=>{ //image is deleted from our server
