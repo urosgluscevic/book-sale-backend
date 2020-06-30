@@ -39,7 +39,12 @@ app.post("/register", async(req, res) => { //registering an user (signup)
     } else {
         try{
             const createdUser = await User.createUser(newUser); //user is created
-            res.status(201).json({"Added user": createdUser, "Message": "User created successfully"}); //201 = created
+            jwt.sign({loggedUser: createdUser}, "booksaleMiodragUros1134", {expiresIn: "2h"}, (err, token) => {
+                if(err){
+                    return new Error(err);
+                }
+                res.status(201).json({token, "Message": "User created in successfully", "Created user": createdUser});
+            })
         } catch(err){
             res.status(500).json({"Error": err, "Message": "User creation failed"});
         } 
