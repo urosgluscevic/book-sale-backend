@@ -472,7 +472,7 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
                         })
 
                         drive.permissions.insert({
-                            fileId: foundFile.id,
+                            fileId: response.data.id,
                             resource: body,
                             auth: auth
                         }, function (err, res, body) {
