@@ -403,7 +403,7 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
         if (err){
             res.sendStatus(401);
         } else{
-            const file = req.files.upfile;
+            const file = req.files.upfile; //the file to be uploaded
             const name = file.name;
             const uploadPath = __dirname + "/" + name;
 
@@ -464,8 +464,9 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
                 }, function (err, response) {
                     if (err) {
                         console.log(err);
+                        res.status(400).json({err})
                     } else {
-                        newUrl = response.data.thumbnailLink;
+                        newUrl = response.data.thumbnailLink; //the url to the image. will be saved in database
                         // console.log(response.data)
 
                         const permission = {
@@ -473,16 +474,14 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
                             "role": "reader"
                         };
 
-                        drive.permissions.create({
+                        drive.permissions.create({ //allows anyone to view the images
                             resource: permission,
                             fileId: response.data.id,
-                            fields: "*"
+                            fields: "id"
                         }, (error, result) => {
                             if(error){
                                 console.log(error)
                                 res.status(400).json({error})
-                            } else {
-                                console.log(result)
                             }
                         })
 
