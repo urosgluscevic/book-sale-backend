@@ -463,23 +463,21 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
                         newUrl = response.data.thumbnailLink;
                         console.log(response.data)
 
-                        let body;
-
                         drive.permissions.list({fileId: response.data.id, auth: auth}, (error, result) => {
-                            body = {
+                            const body = {
                                 'value': 'default',
                                 'type': 'anyone',
                                 'role': 'reader'
                             }
-                        })
 
-                        drive.permissions.insert({
-                            fileId: response.data.id,
-                            resource: body,
-                            auth: auth
-                        }, function (err, res, body) {
-                            deferred.resolve(body);
-                        });
+                            drive.permissions.insert({
+                                fileId: response.data.id,
+                                resource: body,
+                                auth: auth
+                            }, function (err, res, body) {
+                                deferred.resolve(body);
+                            });
+                        })
 
                         if(uploadTo === "user"){
                             User.updateProfile(authData.loggedUser.username, {"profilePictureUrl": newUrl}).then(()=>{ //updates the profilePicture field
