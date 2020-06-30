@@ -8,6 +8,8 @@ const fileupload = require("express-fileupload");
 const {google} = require("googleapis");
 const {connect, verifyToken} = require("./helpers");
 const {DB_URL, PORT} = require("./config");
+const nodemailer = require('nodemailer');
+
 
 const User = require("./controllers/user");
 const Product = require("./controllers/product");
@@ -102,6 +104,32 @@ app.get("/products/:id/buy", verifyToken, async (req,res) => {
             const check = await Transaction.findTransaction({"productId":prodID,"buyer":authData.loggedUser._id});
             if(balance.bookCoinBalance >= seller.price && check[0] == undefined){
                 await Transaction.createTransaction(prodID,authData.loggedUser._id.toString(),seller.user);
+                const sellerUser = await User.findById(seller.user);
+                if(sellerUser.email != undefined){
+                    let transporter = nodemailer.createTransport({
+                        service: 'gmail',
+                        auth: {
+                          user: 'muskthe7th@gmail.com',
+                          pass: "stevanjenajbolji123"
+                        }
+                      });
+
+                      let mailOptions = {
+                        from: 'muskthe7th@gmail.com',
+                        to: sellerUser.email.toString(),
+                        subject: 'Someone actually wants to buy your product',
+                        text: `User ${authData.loggedUser.username} wants to buy your stupid ${seller.name}, go and check that out :) `,
+                        html: "<h1>HERE IS SOME RANDOM HTML</h1>"
+                      };
+
+                      transporter.sendMail(mailOptions, function(error, info){
+                        if (error) {
+                          console.log(error);
+                        } else {
+                          console.log('Email sent: ' + info.response);
+                        }
+                      });
+                }
                 res.status(201).json({"Message": "Transaction created"});
             } else{
                 if(check[0]){

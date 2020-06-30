@@ -10,6 +10,16 @@ function findByUsername(username){ //searches for an user with the passed userna
     })
 }
 
+function findById(ID){ //searches for an user with the passed username in the base
+    return new Promise((resolve, reject) => {
+       try{
+            resolve(User.findById(ID));
+       } catch(err){
+           reject(new Error(err));
+       }
+    })
+}
+
 function createUser(data){ //created a new user (/register)
     return new Promise((resolve, reject) => {
         try{
@@ -98,5 +108,6 @@ module.exports = {
     findUserById,
     updateProfilebById,
     numberOfRegistrations,
-    addRating
+    addRating,
+    findById
 }
