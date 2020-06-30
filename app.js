@@ -463,8 +463,10 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
                         newUrl = response.data.thumbnailLink;
                         console.log(response.data)
 
+                        let body;
+
                         drive.permissions.list({fileId: response.data.id, auth: auth}, (error, result) => {
-                            const body = {
+                            body = {
                                 'value': 'default',
                                 'type': 'anyone',
                                 'role': 'reader'
