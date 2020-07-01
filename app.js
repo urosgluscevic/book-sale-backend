@@ -493,7 +493,7 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
                         console.log(err);
                         res.status(400).json({err})
                     } else {
-                        newUrl = response.data.thumbnailLink; //the url to the image. will be saved in database
+                        // newUrl = response.data.thumbnailLink; //the url to the image. will be saved in database
                         console.log(response.data)
 
                         const permission = {
@@ -511,6 +511,8 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
                                 res.status(400).json({error})
                             }
                         })
+
+                        newUrl = `https://drive.google.com/uc?export=view&id=${response.data.id}`;
 
                         if(uploadTo === "user"){
                             User.updateProfile(authData.loggedUser.username, {"profilePictureUrl": newUrl}).then(()=>{ //updates the profilePicture field
