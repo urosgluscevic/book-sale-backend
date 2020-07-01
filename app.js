@@ -493,8 +493,9 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
                         console.log(err);
                         res.status(400).json({err})
                     } else {
-                        newUrl = response.data.thumbnailLink; //the url to the image. will be saved in database
-                        // console.log(response.data)
+                        // newUrl = response.data.thumbnailLink; //the url to the image. will be saved in database
+                        console.log(response.data)
+                        newUrl = response.data.webViewLink;
 
                         const permission = {
                             "type": "anyone",
