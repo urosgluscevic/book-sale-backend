@@ -493,14 +493,12 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
                         console.log(err);
                         res.status(400).json({err})
                     } else {
-                        // newUrl = response.data.thumbnailLink; //the url to the image. will be saved in database
+                        newUrl = response.data.thumbnailLink; //the url to the image. will be saved in database
                         console.log(response.data)
-                        newUrl = response.data.webViewLink;
 
                         const permission = {
-                            "type": "domain",
-                            "role": "reader",
-                            "domain": "https://happy-panini-cbec22.netlify.app"
+                            "type": "anyone",
+                            "role": "reader"
                         };
 
                         drive.permissions.create({ //allows anyone to view the images
@@ -511,8 +509,6 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
                             if(error){
                                 console.log(error)
                                 res.status(400).json({error})
-                            } else {
-                                console.log(result.data)
                             }
                         })
 
