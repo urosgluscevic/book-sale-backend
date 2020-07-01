@@ -116,7 +116,7 @@ app.get("/products/:id/buy", verifyToken, async (req,res) => {
 
                       let mailOptions = {
                         from: 'muskthe7th@gmail.com',
-                        to: "miokruscic@gmail.com",
+                        to: sellerUser.email.toString(),
                         subject: 'Someone actually wants to buy your product',
                         text: `User ${authData.loggedUser.username} wants to buy your stupid ${seller.name}, go and check that out :) `,
                         html: "<h1>HERE IS SOME RANDOM HTML</h1>"
