@@ -498,8 +498,9 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
                         newUrl = response.data.webViewLink;
 
                         const permission = {
-                            "type": "anyone",
-                            "role": "reader"
+                            "type": "domain",
+                            "role": "reader",
+                            "domain": "https://happy-panini-cbec22.netlify.app"
                         };
 
                         drive.permissions.create({ //allows anyone to view the images
@@ -510,6 +511,8 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
                             if(error){
                                 console.log(error)
                                 res.status(400).json({error})
+                            } else {
+                                console.log(result.data)
                             }
                         })
 
