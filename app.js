@@ -435,6 +435,7 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
             const uploadPath = __dirname + "/" + name;
 
             let newUrl;
+            let safariUrl;
 
             const uploadTo = req.params.uploadTo; //is it a user profile picture, or a product picture
         
@@ -494,7 +495,7 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
                         res.status(400).json({err})
                     } else {
                         // newUrl = response.data.thumbnailLink; //the url to the image. will be saved in database
-                        console.log(response.data)
+                        // console.log(response.data)
 
                         const permission = {
                             "type": "anyone",
@@ -513,6 +514,7 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
                         })
 
                         newUrl = `https://drive.google.com/uc?export=view&id=${response.data.id}`;
+                        safariUrl = response.data.thumbnailLink;
 
                         if(uploadTo === "user"){
                             User.updateProfile(authData.loggedUser.username, {"profilePictureUrl": newUrl}).then(()=>{ //updates the profilePicture field
@@ -530,7 +532,7 @@ app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be s
 
                             Product.findPostById(productId).then((foundProduct) => {
                                 if(foundProduct.user == authData.loggedUser._id){
-                                    Product.updateProduct(productId, {"imageUrl": newUrl}).then(()=>{
+                                    Product.updateProduct(productId, {"imageUrl": newUrl, "safariUrl": safariUrl}).then(()=>{
                                         fs.unlink(uploadPath, (err)=>{ //image is deleted from our server
                                             if(err){
                                                 console.log("file deletion failed", name, err);

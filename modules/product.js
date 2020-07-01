@@ -27,6 +27,7 @@ const productSchema = new mongoose.Schema({
         ref: "user"
     },
     imageUrl: String,
+    safariUrl: String, //should work on safari browser
     condition: {
         type: String,
         required: true
