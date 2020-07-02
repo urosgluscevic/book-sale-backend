@@ -105,7 +105,7 @@ app.get("/products/:id/buy", verifyToken, async (req,res) => {
             if(balance.bookCoinBalance >= seller.price && check[0] == undefined){
                 await Transaction.createTransaction(prodID,authData.loggedUser._id.toString(),seller.user);
                 const sellerUser = await User.findById(seller.user);
-                if(sellerUser.email != undefined){
+                if(sellerUser.email != undefined && seller.subscribed){//checks if the seller has an email address and if he wants to receive the email
                     let transporter = nodemailer.createTransport({
                         service: 'gmail',
                         auth: {
@@ -117,8 +117,8 @@ app.get("/products/:id/buy", verifyToken, async (req,res) => {
                       let mailOptions = {
                         from: 'muskthe7th@gmail.com',
                         to: sellerUser.email.toString(),
-                        subject: 'Someone actually wants to buy your product',
-                        text: `User ${authData.loggedUser.username} wants to buy your stupid ${seller.name}, go and check that out :)`
+                        subject: 'Someone is interested in buying your product',
+                        text: `User ${authData.loggedUser.username} wants to buy your ${seller.name}. Check your transactions for more details, and accept the trade if you want.`
                       };
 
                       transporter.sendMail(mailOptions, function(error, info){
@@ -397,7 +397,7 @@ app.get("/addRating/:username/:rating", verifyToken, (req, res) => {
 app.get("/deleteProduct/:id", verifyToken, (req, res) => {
     jwt.verify(req.token, "booksaleMiodragUros1134", async (err, authData) => {
         if(err){
-            res.sendStatus(403);
+            res.sendStatus(401);
         } else {
             const productId = req.params.id;
             const product = await Product.findPostById(productId) //finds product to be deleted
@@ -423,6 +423,25 @@ app.get("/getProducts/:quantity", async (req, res) => {
     const numberQuantity = parseInt(quantity); //turns quantity into number
     const products = await Product.getProducts(numberQuantity); //finds certain number of products
     res.status(200).json({products});
+})
+
+app.get("/subscriptions/:action", verifyToken, (req, res) => {
+    jwt.verify(req.token, "booksaleMiodragUros1134", async(err, authData) => {
+        if(err){
+            res.sendStatus(401);
+        } else {
+            const action = req.params.action; // enable or disable emails
+            if(action === "disable"){
+                await User.updateProfile(authData.loggedUser.username, {"subscribed": false});
+                res.status(200).json({"Message": "Email prefferences updated successfully"});
+            } else if(action === "enable"){
+                await User.updateProfile(authData.loggedUser.username, {"subscribed": true});
+                res.status(200).json({"Message": "Email prefferences updated successfully"});
+            } else {
+                res.status(400).json({"Message": "Invalid action paramether"})
+            }
+        }
+    })
 })
 
 app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be stored on google drive 

@@ -50,6 +50,10 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
         // required: true
+    },
+    subscribed: { //users can stop receiving emails if they want
+        type: Boolean,
+        default: true
     }
 }, {timestamps: true});
 
