@@ -102,39 +102,43 @@ app.get("/products/:id/buy", verifyToken, async (req,res) => {
             const balance = await User.findByUsername(authData.loggedUser.username)
             const seller = await Product.findPostById(prodID);
             const check = await Transaction.findTransaction({"productId":prodID,"buyer":authData.loggedUser._id});
-            if(balance.bookCoinBalance >= seller.price && check[0] == undefined){
-                await Transaction.createTransaction(prodID,authData.loggedUser._id.toString(),seller.user);
-                const sellerUser = await User.findById(seller.user);
-                if(sellerUser.email != undefined && seller.subscribed){//checks if the seller has an email address and if he wants to receive the email
-                    let transporter = nodemailer.createTransport({
-                        service: 'gmail',
-                        auth: {
-                          user: 'muskthe7th@gmail.com',
-                          pass: "stevanjenajbolji123"
-                        }
-                      });
-
-                      let mailOptions = {
-                        from: 'muskthe7th@gmail.com',
-                        to: sellerUser.email.toString(),
-                        subject: 'Someone is interested in buying your product',
-                        text: `User ${authData.loggedUser.username} wants to buy your ${seller.name}. Check your transactions for more details, and accept the trade if you want.`
-                      };
-
-                      transporter.sendMail(mailOptions, function(error, info){
-                        if (error) {
-                          console.log(error);
-                        } else {
-                          console.log('Email sent: ' + info.response);
-                        }
-                      });
-                }
-                res.status(201).json({"Message": "Transaction created"});
-            } else{
-                if(check[0]){
-                    res.status(403).json({"Message": "You already have a transaction related to this product"})
-                } else {
-                    res.status(403).json({"Message": "You do not have enough bookCoins to buy this product"})
+            if(authData.loggedUser._id == seller._id){
+                res.status(403).json({"Message": "You cannot buy your own product"})
+            } else {
+                if(balance.bookCoinBalance >= seller.price && check[0] == undefined){
+                    await Transaction.createTransaction(prodID,authData.loggedUser._id.toString(),seller.user);
+                    const sellerUser = await User.findById(seller.user);
+                    if(sellerUser.email != undefined && seller.subscribed){//checks if the seller has an email address and if he wants to receive the email
+                        let transporter = nodemailer.createTransport({
+                            service: 'gmail',
+                            auth: {
+                              user: 'muskthe7th@gmail.com',
+                              pass: "stevanjenajbolji123"
+                            }
+                          });
+    
+                          let mailOptions = {
+                            from: 'muskthe7th@gmail.com',
+                            to: sellerUser.email.toString(),
+                            subject: 'Someone is interested in buying your product',
+                            text: `User ${authData.loggedUser.username} wants to buy your ${seller.name}. Check your transactions for more details, and accept the trade if you want.`
+                          };
+    
+                          transporter.sendMail(mailOptions, function(error, info){
+                            if (error) {
+                              console.log(error);
+                            } else {
+                              console.log('Email sent: ' + info.response);
+                            }
+                          });
+                    }
+                    res.status(201).json({"Message": "Transaction created"});
+                } else{
+                    if(check[0]){
+                        res.status(403).json({"Message": "You already have a transaction related to this product"})
+                    } else {
+                        res.status(403).json({"Message": "You do not have enough bookCoins to buy this product"})
+                    }
                 }
             }
         }
