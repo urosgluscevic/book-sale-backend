@@ -111,6 +111,16 @@ function getProducts(quantity){ //returns certain number of products
     })
 }
 
+function getPostDetails(productId){
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(Product.findById(productId).populate("user", ["username", "profilePictureUrl"]));
+        } catch(err){
+            reject(new Error(err));
+        }
+    })
+}
+
 module.exports = {
     createPost,
     findPostByUserId,
@@ -119,5 +129,6 @@ module.exports = {
     deleteProducts,
     updateProduct,
     deleteProduct,
-    getProducts
+    getProducts,
+    getPostDetails
 }

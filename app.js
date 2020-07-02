@@ -444,6 +444,22 @@ app.get("/subscriptions/:action", verifyToken, (req, res) => {
     })
 })
 
+app.get("/products/:id", verifyToken, (req, res) => { //detailed info about a specific product
+    jwt.verify(req.token, "booksaleMiodragUros1134", async(err, authData) => {
+        if(err){
+            res.sendStatus(401);
+        } else {
+            const productId = req.params.id;
+            const product = await Product.getPostDetails(productId);
+            if(product){
+                res.status(200).json({product, "Message": "Product found"})
+            } else {
+                res.status(400).json({"Message": "No product found"});
+            }
+        }
+    })
+})
+
 app.post("/uploadImage/:uploadTo", verifyToken, (req, res)=>{ //images will be stored on google drive 
     jwt.verify(req.token, "booksaleMiodragUros1134", async(err, authData)=>{
         if (err){
