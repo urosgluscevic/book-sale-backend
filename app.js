@@ -147,7 +147,7 @@ app.get("/products/:id/buy", verifyToken, async (req,res) => {
 app.get("/stats/registrations/:gte/:lt",verifyToken, async(req,res) => {
     jwt.verify(req.token, "booksaleMiodragUros1134", async (err, authData) =>{
         if(err || authData.loggedUser.admin == false){
-            res.status(401).json({"Message": "You need to be logged in to view this content"});
+            res.status(401).json({"Message": "You need to be logged in as an admin to view this content"});
         } else {
             const data = await User.numberOfRegistrations(req.params.gte.toString(),req.params.lt.toString());
             res.status(200).json({"Number of registrations":data});
@@ -163,7 +163,7 @@ app.get("/transactions", verifyToken, async(req,res) =>{
             const userId = authData.loggedUser._id.toString();
             const buy = await Transaction.findBuyerTransactions(userId);
             const sell = await Transaction.findSellerTransactions(userId);
-            res.status(200).json({"buy":[buy],"sell":[sell]});
+            res.status(200).json({buy, sell});
         }
     })
 })
