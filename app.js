@@ -292,8 +292,15 @@ app.post("/postComment", verifyToken, (req, res) => { //uploading a comment to s
 
             if(postedTo){
                 data.user = postedTo._id.toString(); //id of the receiving user
-                const newComment = await Comment.postComment(data);
-                res.status(201).json({newComment, "Message": "Comment added"}); // in order to find the comment later (for editing and deleting) the frontend should save the comment _id 
+
+                const spamCheck = await Comment.checkForRepetition(data.user, data.postedBy);
+                
+                if(spamCheck.length < 1){
+                    const newComment = await Comment.postComment(data);
+                    res.status(201).json({newComment, "Message": "Comment added"}); // in order to find the comment later (for editing and deleting) the frontend should save the comment _id 
+                } else {
+                    res.status(403).json({"Message": "You can only post one comment to each user's account"})
+                }
             } else {
                 res.status(400).json({"Message": "User whose account you are trying to comment on does not exist"})
             }
