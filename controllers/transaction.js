@@ -70,7 +70,7 @@ function findTransactionByIdAndUpdate(transactionId,operation){
 function findBuyerTransactions(userId){
     return new Promise((resolve, reject) => {
         try{
-            resolve(Transaction.find({"buyer":userId}).populate("seller", ["username", "location", "phoneNumber"]).populate("productId", ["name", "price"]));
+            resolve(Transaction.find({"buyer":userId}).populate("seller", ["username", "location", "phoneNumber", "profilePictureUrl"]).populate("productId", ["name", "price", "imageUrl"]));
         } catch (err){
             reject(new Error(err));
         }
@@ -80,7 +80,7 @@ function findBuyerTransactions(userId){
 function findSellerTransactions(userId){
     return new Promise((resolve, reject) => {
         try{
-            resolve(Transaction.find({"seller":userId}).populate("buyer", ["username", "location", "phoneNumber"]).populate("productId", ["name", "price"]));
+            resolve(Transaction.find({"seller":userId}).populate("buyer", ["username", "location", "phoneNumber", "profilePictureUrl"]).populate("productId", ["name", "price", "imageUrl"]));
         } catch (err){
             reject(new Error(err));
         }
