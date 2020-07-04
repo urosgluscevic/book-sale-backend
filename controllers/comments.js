@@ -63,7 +63,7 @@ function deleteComments(userId){ //called when a user's profile is deleted. dele
 function checkForRepetition(poster, receiver){ //prevents user from spamming comments
     return new Promise((resolve, reject) => {
         try{
-            resolve(Comment.find({"user": receiver}))
+            resolve(Comment.find({"user": receiver, "postedBy": poster}))
         }catch(err){
             reject(new Error(err));
         }

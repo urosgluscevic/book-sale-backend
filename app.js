@@ -293,7 +293,7 @@ app.post("/postComment", verifyToken, (req, res) => { //uploading a comment to s
             if(postedTo){
                 data.user = postedTo._id.toString(); //id of the receiving user
 
-                const spamCheck = await Comment.checkForRepetition(data.user, data.postedBy);
+                const spamCheck = await Comment.checkForRepetition(data.postedBy, data.user);
 
                 console.log({spamCheck})
                 console.log(spamCheck.length)
