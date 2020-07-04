@@ -297,6 +297,8 @@ app.post("/postComment", verifyToken, (req, res) => { //uploading a comment to s
 
                 console.log({spamCheck})
                 console.log(spamCheck.length)
+
+                console.log(data.user, data.postedBy)
                 
                 if(spamCheck.length < 1){
                     const newComment = await Comment.postComment(data);
