@@ -198,7 +198,7 @@ app.get("/transactions/:id/accept", verifyToken, async(req,res) => {
                         await Transaction.findTransactionByIdAndUpdate(req.params.id,"buyerConsent");
                         transaction.buyerConsent = true;
                         buy();
-                        res.sendStatus(201);
+                        res.status(201).json({"Message": "Transaction completed"});
                     }
                     else{
                         res.status(403).json({"Message":"Not enough book coins"});
@@ -209,7 +209,7 @@ app.get("/transactions/:id/accept", verifyToken, async(req,res) => {
                     await Transaction.findTransactionByIdAndUpdate(req.params.id,"sellerConsent");
                     transaction.sellerConsent = true;
                     buy()
-                    res.sendStatus(201);
+                    res.status(201).json({"Message": "You accepted the transaction. Contact the buyer and finalise your transaction in person. Remind him to confirm the transaction upon receiving the product"});
                     break;
                 default:
                     console.log(userId==transaction.buyer._id);
