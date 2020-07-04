@@ -230,6 +230,18 @@ app.get("/transactions/:id/accept", verifyToken, async(req,res) => {
     })
 })
 
+app.get("/transactions/:id/reject", verifyToken, (req, res) => {
+    jwt.verify(req.token, "booksaleMiodragUros1134", async(err, authData) => {
+        if(err){
+            res.status(401).json({"Message": "You need to be logged in to view this content"})
+        } else {
+            const transactionId = req.params.id;
+            await Transaction.removeTransactionById(transactionId);
+            res.status(200).json({"Message": "Transaction deleted"});
+        }
+    })
+})
+
 app.post("/createPost", verifyToken, async (req,res) => {
     jwt.verify(req.token, "booksaleMiodragUros1134",async(err, authData)=>{
         if(err){

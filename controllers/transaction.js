@@ -107,6 +107,16 @@ function dropByUserId(userId){
     })
 }
 
+function removeTransactionById(transactionId){
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(Transaction.findByIdAndDelete(transactionId))
+        } catch (err){
+            reject(new Error(err));
+        }
+    })
+}
+
 module.exports = {
     createTransaction,
     findBuyerTransactions,
@@ -117,5 +127,6 @@ module.exports = {
     removeTransaction,
     findTransaction,
     dropAllTransactions,
-    dropByUserId
+    dropByUserId,
+    removeTransactionById
 }
