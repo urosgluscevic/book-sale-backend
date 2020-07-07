@@ -13,7 +13,7 @@ function postComment(data){
 function findAllComments(id){ //returns all comments of the user with the passed id
     return new Promise((resolve, reject) => {
         try{
-            resolve(Comment.find({"user": id}).populate("postedBy", "username"))
+            resolve(Comment.find({"user": id}).populate("postedBy", ["username", "profilePictureUrl"]))
         } catch(err){
             reject(new Error(err));
         }
