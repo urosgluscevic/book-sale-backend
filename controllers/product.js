@@ -35,7 +35,7 @@ function findProducts(data){
     return new Promise((resolve, reject) => {
         try{
             const name = data.name || ""; //if the name is not passed through the request, it's set to an empty string
-            const namePattern = new RegExp(name, "g"); //the value is made into a regular expression. Empty string matches anything
+            const namePattern = new RegExp(name, "i"); //the value is made into a regular expression. Empty string matches anything
 
             const condition = data.condition || "";
             const conditionPattern = new RegExp(condition, "g");
