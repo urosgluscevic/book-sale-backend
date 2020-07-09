@@ -54,7 +54,7 @@ function findProducts(data){
                 "condition": {$regex: conditionPattern},
                 "price": {$gte: minPrice, $lte: maxPrice}, //greater than minimal price and lesser than the maximum price
                 "category": {$regex: categoryPattern}
-            }).populate("user", "username");
+            }).populate("user", ["username", "profilePictureUrl"]);
 
             if(sortBy === "price"){
                 matchingProducts.sort({"price": sortOrder})
