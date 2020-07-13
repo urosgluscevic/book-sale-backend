@@ -46,8 +46,8 @@ function findProducts(data){
             const category = data.category || "";
             const categoryPattern = new RegExp(category, "g");
 
-            // const location = data.location || "";
-            // const locationPattern = new RegExp(location, "g");
+            const location = data.location || "";
+            const locationPattern = new RegExp(location, "g");
             
             const sortBy = data.sortBy; // parameter to sort by
             const sortOrder = data.sortOrder; // ascending or descending order
@@ -56,7 +56,8 @@ function findProducts(data){
                 "name": {$regex: namePattern},
                 "condition": {$regex: conditionPattern},
                 "price": {$gte: minPrice, $lte: maxPrice}, //greater than minimal price and lesser than the maximum price
-                "category": {$regex: categoryPattern}
+                "category": {$regex: categoryPattern},
+                "location": {$regex: locationPattern}
             }).populate("user", ["username", "profilePictureUrl"]);
 
             if(sortBy === "price"){
