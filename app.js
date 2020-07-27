@@ -62,7 +62,7 @@ app.post("/login", async(req, res) => {
                 if(err){
                     return new Error(err);
                 }
-                res.status(200).json({token, "Message": "User logged in successfully"});
+                res.status(200).json({token, "Admin": loggedUser.admin,  "Message": "User logged in successfully"});
             })
         } else {
             res.status(403).json({"Message": "invalid password"});
