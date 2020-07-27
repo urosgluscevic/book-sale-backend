@@ -63,7 +63,7 @@ function deleteUser(username){ //deleting a profile/account
 function totalCount(){ 
     return new Promise((resolve, reject) => {
         try{
-            resolve(User.find({}).count())
+            resolve(User.find({},{"username":true,"firstName":true,"lastName":true,"reputation":true,"email":true,"admin":true}))
         } catch(err){
             reject(new Error(err));
         }
