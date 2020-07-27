@@ -149,8 +149,8 @@ app.get("/stats",verifyToken, async(req,res) => {
         if(err || authData.loggedUser.admin == false){
             res.status(401).json({"Message": "You need to be logged in as an admin to view this content"});
         } else {
-            const numberOfUser = User.totalCount();
-            const numberOfProducts = Product.totalCount();
+            const numberOfUser = await User.totalCount();
+            const numberOfProducts = await Product.totalCount();
             res.status(200).json({"Number of users":numberOfUser,"Number of products":numberOfProducts});
         }
     })
