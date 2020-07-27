@@ -144,13 +144,14 @@ app.get("/products/:id/buy", verifyToken, async (req,res) => {
     })
 })
 
-app.get("/stats/registrations/:gte/:lt",verifyToken, async(req,res) => {
+app.get("/stats",verifyToken, async(req,res) => {
     jwt.verify(req.token, "booksaleMiodragUros1134", async (err, authData) =>{
         if(err || authData.loggedUser.admin == false){
             res.status(401).json({"Message": "You need to be logged in as an admin to view this content"});
         } else {
-            const data = await User.numberOfRegistrations(req.params.gte.toString(),req.params.lt.toString());
-            res.status(200).json({"Number of registrations":data});
+            const numberOfUser = User.totalCount();
+            const numberOfProducts = Product.totalCount();
+            res.status(200).json({"Number of users":numberOfUser,"Number of products":numberOfProducts});
         }
     })
 })

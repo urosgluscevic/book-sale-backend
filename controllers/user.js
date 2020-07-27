@@ -60,13 +60,10 @@ function deleteUser(username){ //deleting a profile/account
     })
 }
 
-function numberOfRegistrations(gte,lt){
-    return new Promise((resolve, reject) =>{
-        try {
-            resolve(User.find({createdAt: {
-                $gte: ISODate(gte + " 00:00:00.000Z"),
-                $lt: ISODate(lt + " 23:59:99.999Z")}
-                }).count())
+function totalCount(){ 
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(User.find({}).count())
         } catch(err){
             reject(new Error(err));
         }
@@ -107,7 +104,7 @@ module.exports = {
     deleteUser,
     findUserById,
     updateProfilebById,
-    numberOfRegistrations,
+    totalCount,
     addRating,
     findById
 }

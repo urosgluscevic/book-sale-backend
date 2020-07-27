@@ -20,6 +20,16 @@ function findPostByUserId(userId){
     })
 }
 
+function totalCount(){ 
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(Product.find({}).count())
+        } catch(err){
+            reject(new Error(err));
+        }
+    })
+}
+
 function findPostById(ID){
     return new Promise((resolve, reject) => {
         try{
@@ -133,5 +143,6 @@ module.exports = {
     updateProduct,
     deleteProduct,
     getProducts,
-    getPostDetails
+    getPostDetails,
+    totalCount
 }
