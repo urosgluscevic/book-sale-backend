@@ -25,7 +25,7 @@ app.use(json());
 app.use(fileupload());
 
 app.get("/", (req, res) => {
-    res.status(200).json({"Message":"Welcome to bok api"});
+    res.status(200).json({"Message":"Welcome to book api"});
 })
 
 
@@ -151,7 +151,7 @@ app.get("/stats",verifyToken, async(req,res) => {
         } else {
             const numberOfUser = await User.totalCount();
             const numberOfProducts = await Product.totalCount();
-            res.status(200).json({"Number of users":numberOfUser,"Number of products":numberOfProducts});
+            res.status(200).json({"Users":numberOfUser,"Products":numberOfProducts});
         }
     })
 })
