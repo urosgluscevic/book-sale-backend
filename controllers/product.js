@@ -20,10 +20,10 @@ function findPostByUserId(userId){
     })
 }
 
-function totalCount(){ 
+function totalCount(quantity){ 
     return new Promise((resolve, reject) => {
         try{
-            resolve(Product.find({},{name:"true",imageUrl:"true"}).populate("user", ["username", "profilePictureUrl"]))
+            resolve(Product.find({},{name:"true",imageUrl:"true"}).limit(quantity).populate("user", ["username", "profilePictureUrl"]))
         } catch(err){
             reject(new Error(err));
         }
