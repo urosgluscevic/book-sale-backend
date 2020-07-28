@@ -144,13 +144,13 @@ app.get("/products/:id/buy", verifyToken, async (req,res) => {
     })
 })
 
-app.get("/stats/:quantity",verifyToken, async(req,res) => {
+app.get("/stats",verifyToken, async(req,res) => {
     jwt.verify(req.token, "booksaleMiodragUros1134", async (err, authData) =>{
         if(err || authData.loggedUser.admin == false){
             res.status(401).json({"Message": "You need to be logged in as an admin to view this content"});
         } else {
             const numberOfUser = await User.totalCount();
-            const numberOfProducts = await Product.totalCount(req.params.quantity);
+            const numberOfProducts = await Product.totalCount();
             res.status(200).json({"Users":numberOfUser,"Products":numberOfProducts});
         }
     })
