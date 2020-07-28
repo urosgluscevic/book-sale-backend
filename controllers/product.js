@@ -23,7 +23,7 @@ function findPostByUserId(userId){
 function totalCount(){ 
     return new Promise((resolve, reject) => {
         try{
-            resolve(Product.find({},{name:"true",imageUrl:"true"}).populate("name", ["username", "profilePictureUrl"]))
+            resolve(Product.find({},{name:"true",imageUrl:"true"}).populate("name",{"username":true , "profilePictureUrl":true}))
         } catch(err){
             reject(new Error(err));
         }
